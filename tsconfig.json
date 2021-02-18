@@ -1,0 +1,37 @@
+{
+ "compilerOptions": {
+   "lib": ["es2018"],
+   "baseUrl": "./src",
+   "emitDecoratorMetadata": true,
+   "esModuleInterop": true,
+   "experimentalDecorators": true,
+   "strictPropertyInitialization": false,
+   "importHelpers": true,
+   "module": "commonjs",
+   "outDir": "dist",
+   "removeComments": true,
+   "sourceMap": true,
+   "strict": true,
+   "target": "es2018",
+   "moduleResolution": "node",
+   "types": [
+     "node"
+   ],
+   "typeRoots": [
+     "node_modules/@types"
+   ]
+ },
+ "include": [
+   "src/**/*.ts",
+   "spec/**/*.ts"
+ ],
+ "exclude": [
+   "src/public/"
+ ],
+ "ts-node": {
+   "files": true
+ },
+ "files": [
+   "src/types/*.d.ts"
+ ]
+}

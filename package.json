@@ -1,0 +1,36 @@
+{
+  "name": "template_backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --ext .ts",
+    "start": "ts-node-dev ./src/index.ts",
+    "typeorm": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.11",
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1",
+    "http-status-codes": "^2.1.4",
+    "pg": "^8.5.1",
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^9.1.1",
+    "tsconfig-paths": "^3.9.0",
+    "typeorm": "^0.2.31",
+    "typescript": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.2",
+    "@typescript-eslint/eslint-plugin": "^4.15.1",
+    "@typescript-eslint/parser": "^4.15.1",
+    "eslint": "^7.20.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-import-resolver-typescript": "^2.4.0",
+    "eslint-plugin-import": "^2.22.1",
+    "ts-node-dev": "^1.1.1"
+  }
+}
