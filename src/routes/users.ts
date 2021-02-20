@@ -2,10 +2,13 @@ import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { User } from '../entities';
+import { hash } from '../utils';
 
 const router = Router();
 
-const { BAD_REQUEST, NOT_FOUND, OK } = StatusCodes;
+const {
+  BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
+} = StatusCodes;
 
 type UserInput = {id?: number, email?: string, name?: string, password?: string}
 
@@ -31,7 +34,14 @@ router.post('/', async (req: Request<GenericObject, GenericObject, UserInput>, r
   const user = new User();
   user.name = name;
   user.email = email;
-  user.password = password; // TODO: Hash
+
+  try {
+    const hashedPassword = await hash(password);
+    user.password = hashedPassword;
+  } catch (err) {
+    res.status(INTERNAL_SERVER_ERROR).send('Could not create user');
+  }
+
   await user.save();
 
   res.status(OK).json(user);
@@ -58,9 +68,20 @@ router.patch('/', async (req: Request<GenericObject, GenericObject, UserInput>, 
     return;
   }
 
+  let updatedPassword = user.password;
+
+  if (password) {
+    try {
+      updatedPassword = await hash(password);
+    } catch (err) {
+      res.status(INTERNAL_SERVER_ERROR).send('Could not update user');
+    }
+  }
+
   user.name = name ?? user.name;
   user.email = email ?? user.email;
-  user.password = password ?? user.password; // TODO: Hash
+  user.password = updatedPassword;
+
   await user.save();
 
   res.status(OK).json(user);
