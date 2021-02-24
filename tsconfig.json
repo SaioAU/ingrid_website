@@ -12,18 +12,19 @@
    "removeComments": true,
    "sourceMap": true,
    "strict": true,
+   "noImplicitAny": true,
    "target": "es2018",
    "moduleResolution": "node",
-   "types": [
-     "node"
-   ],
+   "allowJs": true,
+   "noEmit": true,
+   "types": [ "node", "jest" ],
    "typeRoots": [
      "node_modules/@types"
    ]
  },
  "include": [
    "src/**/*.ts",
-   "spec/**/*.ts"
+   "src/**/*.js"
  ],
  "exclude": [
    "src/public/"

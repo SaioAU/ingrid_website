@@ -5,7 +5,7 @@
    "username": "postgres",
    "synchronize": false,
    "migrationsRun": true,
-   "logging": true,
+   "logging": false,
    "entities": ["src/entities/**/*.ts"],
    "migrations": ["src/migrations/**/*.ts"],
    "subscribers": ["src/subscribers/**/*.ts"],

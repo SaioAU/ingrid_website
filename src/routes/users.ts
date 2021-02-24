@@ -16,7 +16,21 @@ type UserInput = {id?: number, email?: string, name?: string, password?: string}
 router.get('/all', async (_: Request, res: Response): Promise<void> => {
   const users = await User.find();
 
-  res.status(OK).json({ users });
+  res.status(OK).json(users);
+});
+
+// curl http://localhost:3000/users?id=1
+router.get('/', async (req: Request, res: Response): Promise<void> => {
+  const id = Number(req.query.id);
+
+  if (!id) {
+    res.status(BAD_REQUEST).send('Missing id');
+    return;
+  }
+
+  const user = await User.findOne({ id });
+
+  res.status(OK).json(user);
 });
 
 /*
