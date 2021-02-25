@@ -6,123 +6,148 @@ import { hash } from '../utils';
 
 const router = Router();
 
-const {
-  BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK,
-} = StatusCodes;
+const { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK } = StatusCodes;
 
-type UserInput = {id?: number, email?: string, name?: string, password?: string}
+type UserInput = {
+  id?: number;
+  email?: string;
+  name?: string;
+  password?: string;
+};
 
 // curl http://localhost:3000/users/all
-router.get('/all', async (_: Request, res: Response): Promise<void> => {
-  const users = await User.find();
+router.get(
+  '/all',
+  async (_: Request, res: Response): Promise<void> => {
+    const users = await User.find();
 
-  res.status(OK).json(users);
-});
+    res.status(OK).json(users);
+  },
+);
 
 // curl http://localhost:3000/users?id=1
-router.get('/', async (req: Request, res: Response): Promise<void> => {
-  const id = Number(req.query.id);
+router.get(
+  '/',
+  async (req: Request, res: Response): Promise<void> => {
+    const id = Number(req.query.id);
 
-  if (!id) {
-    res.status(BAD_REQUEST).send('Missing id');
-    return;
-  }
+    if (!id) {
+      res.status(BAD_REQUEST).send('Missing id');
+      return;
+    }
 
-  const user = await User.findOne({ id });
+    const user = await User.findOne({ id });
 
-  res.status(OK).json(user);
-});
+    res.status(OK).json(user);
+  },
+);
 
 /*
 curl -XPOST -H "Content-Type: application/json" http://localhost:3000/users \
 --data '{"email": "test@example.com", "name": "Newman", "password": "yolo1234"}'
 */
-router.post('/', async (req: Request<GenericObject, GenericObject, UserInput>, res: Response): Promise<void> => {
-  const { email, name, password } = req.body;
+router.post(
+  '/',
+  async (
+    req: Request<GenericObject, GenericObject, UserInput>,
+    res: Response,
+  ): Promise<void> => {
+    const { email, name, password } = req.body;
 
-  if (!email || !name || !password) {
-    res.status(BAD_REQUEST).send('Missing email, name or password');
-    return;
-  }
+    if (!email || !name || !password) {
+      res.status(BAD_REQUEST).send('Missing email, name or password');
+      return;
+    }
 
-  const user = new User();
-  user.name = name;
-  user.email = email;
+    const user = new User();
+    user.name = name;
+    user.email = email;
 
-  try {
-    const hashedPassword = await hash(password);
-    user.password = hashedPassword;
-  } catch (err) {
-    res.status(INTERNAL_SERVER_ERROR).send('Could not create user');
-  }
+    try {
+      const hashedPassword = await hash(password);
+      user.password = hashedPassword;
+    } catch (err) {
+      res.status(INTERNAL_SERVER_ERROR).send('Could not create user');
+    }
 
-  await user.save();
+    await user.save();
 
-  res.status(OK).json(user);
-});
+    res.status(OK).json(user);
+  },
+);
 
 /*
 curl -XPATCH -H "Content-Type: application/json" http://localhost:3000/users \
 --data '{"id": 1, "name": "new name"}'
 */
-router.patch('/', async (req: Request<GenericObject, GenericObject, UserInput>, res: Response): Promise<void> => {
-  const {
-    id, email, name, password,
-  } = req.body;
+router.patch(
+  '/',
+  async (
+    req: Request<GenericObject, GenericObject, UserInput>,
+    res: Response,
+  ): Promise<void> => {
+    const { id, email, name, password } = req.body;
 
-  if (!id) {
-    res.status(BAD_REQUEST).send('Missing id');
-    return;
-  }
-
-  const user = await User.findOne({ id });
-
-  if (!user) {
-    res.status(NOT_FOUND).send('User not found');
-    return;
-  }
-
-  let updatedPassword = user.password;
-
-  if (password) {
-    try {
-      updatedPassword = await hash(password);
-    } catch (err) {
-      res.status(INTERNAL_SERVER_ERROR).send('Could not update user');
+    if (!id) {
+      res.status(BAD_REQUEST).send('Missing id');
+      return;
     }
-  }
 
-  user.name = name ?? user.name;
-  user.email = email ?? user.email;
-  user.password = updatedPassword;
+    const user = await User.findOne({ id });
 
-  await user.save();
+    if (!user) {
+      res.status(NOT_FOUND).send('User not found');
+      return;
+    }
 
-  res.status(OK).json(user);
-});
+    let updatedPassword = user.password;
+
+    if (password) {
+      try {
+        updatedPassword = await hash(password);
+      } catch (err) {
+        res.status(INTERNAL_SERVER_ERROR).send('Could not update user');
+      }
+    }
+
+    user.name = name ?? user.name;
+    user.email = email ?? user.email;
+    user.password = updatedPassword;
+
+    await user.save();
+
+    res.status(OK).json(user);
+  },
+);
 
 /*
 curl -XDELETE -H "Content-Type: application/json" http://localhost:3000/users \
 --data '{"id": 1}'
 */
-router.delete('/', async (req: Request<GenericObject, GenericObject, UserInput>, res: Response): Promise<void> => {
-  const { id } = req.body;
+router.delete(
+  '/',
+  async (
+    req: Request<GenericObject, GenericObject, UserInput>,
+    res: Response,
+  ): Promise<void> => {
+    const { id } = req.body;
 
-  if (!id) {
-    res.status(BAD_REQUEST).send('Missing id');
-    return;
-  }
+    if (!id) {
+      res.status(BAD_REQUEST).send('Missing id');
+      return;
+    }
 
-  const user = await User.findOne({ id });
+    const user = await User.findOne({ id });
 
-  if (!user) {
-    res.status(NOT_FOUND).send('User not found');
-    return;
-  }
+    if (!user) {
+      res.status(NOT_FOUND).send('User not found');
+      return;
+    }
 
-  await user.remove();
+    await user.remove();
 
-  res.status(OK).json({ id });
-});
+    res.status(OK).json({ id });
+  },
+);
 
 export default router;

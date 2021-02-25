@@ -86,4 +86,61 @@ describe('Users', () => {
       expect(user).toMatchObject(body);
     });
   });
+
+  describe('patch', () => {
+    test('should update user with hashed password', async () => {
+      let user: User | undefined = await createUser({
+        name: 'user 1',
+        email: 'user1@example.com',
+        password: 'password1',
+      });
+      const originalPassword = user.password;
+      const originalEmail = user.email;
+      const newName = 'new name';
+      const newPassword = 'new password';
+
+      const { body } = await request(app)
+        .patch('/users')
+        .send({
+          id: user.id,
+          name: newName,
+          email: 'user1@example.com',
+          password: newPassword,
+        })
+        .expect(200);
+
+      expect(body).toMatchObject(
+        expect.objectContaining({
+          name: newName,
+          email: originalEmail,
+          id: user.id,
+        }),
+      );
+      expect(body.password).toBeTruthy();
+      expect(body.password).not.toBe(originalPassword);
+      expect(body.password).not.toBe(newPassword);
+
+      user = await User.findOne({ id: body.id });
+      expect(user).toMatchObject(body);
+    });
+  });
+
+  describe('delete', () => {
+    test('should delete user', async () => {
+      const user = await createUser({
+        name: 'user 1',
+        email: 'user1@example.com',
+        password: 'password1',
+      });
+      expect(await User.find({})).toHaveLength(1);
+
+      const { body } = await request(app)
+        .delete('/users')
+        .send({ id: user.id })
+        .expect(200);
+
+      expect(body).toMatchObject({ id: user.id });
+      expect(await User.find({})).toHaveLength(0);
+    });
+  });
 });
