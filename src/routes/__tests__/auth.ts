@@ -34,7 +34,7 @@ describe('Auth', () => {
 
       const { text: token } = await request(app)
         .post('/auth/login')
-        .send({ email: user.email })
+        .send({ email: user?.email })
         .expect(400);
 
       expect(token).toBeFalsy();
@@ -58,17 +58,15 @@ describe('Auth', () => {
 
       const { text: token } = await request(app)
         .post('/auth/login')
-        .send({ email: user.email, password: 'wrong password' })
+        .send({ email: user?.email, password: 'wrong password' })
         .expect(401);
 
       expect(token).toBeFalsy();
     });
     test('return token', async () => {
       const password = 'testPassword';
-      const hashedPassword = await hash(password);
-      const user = await createUser({ password: hashedPassword });
-
-      const token = await getToken({ email: user.email, password });
+      const user = await createUser({ password });
+      const token = await getToken({ email: user?.email, password });
 
       expect(token).toBeTruthy();
     });

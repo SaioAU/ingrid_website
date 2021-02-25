@@ -8,11 +8,7 @@ export const createUser = async ({
   name?: string;
   email?: string;
   password?: string;
-}): Promise<User> => {
-  const user = new User();
-  user.name = name;
-  user.email = email;
-  user.password = password;
-  await user.save();
+}): Promise<User | undefined> => {
+  const user = await User.createUser(name, email, password);
   return user;
 };

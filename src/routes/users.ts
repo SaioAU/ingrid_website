@@ -9,6 +9,8 @@ const router = Router();
 
 const { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK } = StatusCodes;
 
+// TODO: create admin user
+
 // curl http://localhost:3000/users/all
 router.get(
   '/all',
@@ -56,18 +58,12 @@ router.post(
       return;
     }
 
-    const user = new User();
-    user.name = name;
-    user.email = email;
+    const user = await User.createUser(name, email, password);
 
-    try {
-      const hashedPassword = await hash(password);
-      user.password = hashedPassword;
-    } catch (err) {
+    if (!user) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not create user');
+      return;
     }
-
-    await user.save();
 
     res.status(OK).json(user);
   },

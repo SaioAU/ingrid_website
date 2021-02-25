@@ -12,7 +12,12 @@ const { BAD_REQUEST, OK, UNAUTHORIZED } = StatusCodes;
 
 const router = Router();
 
-// Check password and return new auth token
+/*
+Check password and return new auth token
+
+curl -XPOST -H "Content-Type: application/json" http://localhost:3000/auth/login \
+--data '{"email": "test@example.com", "password": "yolo1234"}'
+*/
 router.post(
   '/login',
   async (

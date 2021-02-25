@@ -2,8 +2,6 @@ import { BaseEntity, Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 import { hash } from '../utils';
 
-// TODO: hash password on creation here
-
 @Entity()
 class User extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -27,6 +25,26 @@ class User extends BaseEntity {
     } catch (err) {
       return false;
     }
+  }
+
+  static async createUser(
+    name: string,
+    email: string,
+    password: string,
+  ): Promise<User | undefined> {
+    const user = new User();
+    user.name = name;
+    user.email = email;
+
+    try {
+      const hashedPassword = await hash(password);
+      user.password = hashedPassword;
+    } catch (err) {
+      return undefined;
+    }
+
+    await user.save();
+    return user;
   }
 }
 

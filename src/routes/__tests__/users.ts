@@ -20,22 +20,23 @@ describe('Users', () => {
 
       const { body } = await request(app)
         .get('/users')
-        .query({ id: user.id })
+        .query({ id: user?.id })
         .expect(401);
 
       expect(body).toMatchObject({});
     });
     test('should return user', async () => {
       const user = await createUser({});
-      const token = createJwt({ email: user.email, userId: user.id });
+      const token = createJwt({ email: user?.email, userId: user?.id });
 
       const { body } = await request(app)
         .get('/users')
         .set('auth', token)
-        .query({ id: user.id })
+        .query({ id: user?.id })
         .expect(200);
 
-      expect(body).toMatchObject(user);
+      expect(body).toMatchObject({ ...(user ?? {}) });
+      expect(body.password).toBeTruthy();
     });
     test('/all should not return users without auth', async () => {
       await createUser({});
@@ -49,7 +50,7 @@ describe('Users', () => {
         email: 'user2@example.com',
         password: 'password2',
       });
-      const token = createJwt({ email: user1.email, userId: user1.id });
+      const token = createJwt({ email: user1?.email, userId: user1?.id });
       const { body } = await request(app)
         .get('/users/all')
         .set('auth', token)
@@ -77,8 +78,8 @@ describe('Users', () => {
     test('should create user with hashed password', async () => {
       const anotherUser = await createUser({});
       const token = createJwt({
-        email: anotherUser.email,
-        userId: anotherUser.id,
+        email: anotherUser?.email,
+        userId: anotherUser?.id,
       });
 
       const { body } = await request(app)
@@ -106,15 +107,15 @@ describe('Users', () => {
   describe('patch', () => {
     test('should not update user without auth', async () => {
       let user: User | undefined = await createUser({});
-      const originalPassword = user.password;
-      const originalName = user.name;
+      const originalPassword = user?.password;
+      const originalName = user?.name;
       const newName = 'new name';
       const newPassword = 'new password';
 
       const { body } = await request(app)
         .patch('/users')
         .send({
-          id: user.id,
+          id: user?.id,
           name: newName,
           email: 'user1@example.com',
           password: newPassword,
@@ -123,15 +124,15 @@ describe('Users', () => {
 
       expect(body).toMatchObject({});
 
-      user = await User.findOne({ id: user.id });
+      user = await User.findOne({ id: user?.id });
       expect(user?.password).toBe(originalPassword);
       expect(user?.name).toBe(originalName);
     });
     test('should update user with hashed password', async () => {
       let user: User | undefined = await createUser({});
-      const token = createJwt({ email: user.email, userId: user.id });
-      const originalPassword = user.password;
-      const originalEmail = user.email;
+      const token = createJwt({ email: user?.email, userId: user?.id });
+      const originalPassword = user?.password;
+      const originalEmail = user?.email;
       const newName = 'new name';
       const newPassword = 'new password';
 
@@ -139,7 +140,7 @@ describe('Users', () => {
         .patch('/users')
         .set('auth', token)
         .send({
-          id: user.id,
+          id: user?.id,
           name: newName,
           email: 'user1@example.com',
           password: newPassword,
@@ -150,7 +151,7 @@ describe('Users', () => {
         expect.objectContaining({
           name: newName,
           email: originalEmail,
-          id: user.id,
+          id: user?.id,
         }),
       );
       expect(body.password).toBeTruthy();
@@ -169,7 +170,7 @@ describe('Users', () => {
 
       const { body } = await request(app)
         .delete('/users')
-        .send({ id: user.id })
+        .send({ id: user?.id })
         .expect(401);
 
       expect(body).toMatchObject({});
@@ -177,16 +178,16 @@ describe('Users', () => {
     });
     test('should delete user', async () => {
       const user = await createUser({});
-      const token = createJwt({ email: user.email, userId: user.id });
+      const token = createJwt({ email: user?.email, userId: user?.id });
       expect(await User.find({})).toHaveLength(1);
 
       const { body } = await request(app)
         .delete('/users')
         .set('auth', token)
-        .send({ id: user.id })
+        .send({ id: user?.id })
         .expect(200);
 
-      expect(body).toMatchObject({ id: user.id });
+      expect(body).toMatchObject({ id: user?.id });
       expect(await User.find({})).toHaveLength(0);
     });
   });
