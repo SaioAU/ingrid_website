@@ -3,21 +3,16 @@ import { StatusCodes } from 'http-status-codes';
 
 import { User } from '../entities';
 import { hash } from '../utils';
+import { checkJwt } from './middlewares';
 
 const router = Router();
 
 const { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK } = StatusCodes;
 
-type UserInput = {
-  id?: number;
-  email?: string;
-  name?: string;
-  password?: string;
-};
-
 // curl http://localhost:3000/users/all
 router.get(
   '/all',
+  [checkJwt],
   async (_: Request, res: Response): Promise<void> => {
     const users = await User.find();
 
@@ -28,6 +23,7 @@ router.get(
 // curl http://localhost:3000/users?id=1
 router.get(
   '/',
+  [checkJwt],
   async (req: Request, res: Response): Promise<void> => {
     const id = Number(req.query.id);
 
@@ -48,6 +44,7 @@ curl -XPOST -H "Content-Type: application/json" http://localhost:3000/users \
 */
 router.post(
   '/',
+  [checkJwt],
   async (
     req: Request<GenericObject, GenericObject, UserInput>,
     res: Response,
@@ -82,6 +79,7 @@ curl -XPATCH -H "Content-Type: application/json" http://localhost:3000/users \
 */
 router.patch(
   '/',
+  [checkJwt],
   async (
     req: Request<GenericObject, GenericObject, UserInput>,
     res: Response,
@@ -126,6 +124,7 @@ curl -XDELETE -H "Content-Type: application/json" http://localhost:3000/users \
 */
 router.delete(
   '/',
+  [checkJwt],
   async (
     req: Request<GenericObject, GenericObject, UserInput>,
     res: Response,

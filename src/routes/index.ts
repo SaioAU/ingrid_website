@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
+import AuthRouter from './auth';
 import UserRouter from './users';
 
 const router = Router();
@@ -15,5 +16,7 @@ router.get('/healthcheck', (_: Request, res: Response): void => {
 });
 
 router.use('/users', UserRouter);
+
+router.use('/auth', AuthRouter);
 
 export default router;
