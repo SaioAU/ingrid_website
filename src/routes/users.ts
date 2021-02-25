@@ -9,9 +9,7 @@ const router = Router();
 
 const { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK } = StatusCodes;
 
-// TODO: create admin user
-
-// curl http://localhost:3000/users/all
+// curl -H "Auth: ..." http://localhost:3000/users/all
 router.get(
   '/all',
   [checkJwt],
@@ -22,7 +20,7 @@ router.get(
   },
 );
 
-// curl http://localhost:3000/users?id=1
+// curl -H "Auth: ..." http://localhost:3000/users?id=1
 router.get(
   '/',
   [checkJwt],
@@ -41,7 +39,7 @@ router.get(
 );
 
 /*
-curl -XPOST -H "Content-Type: application/json" http://localhost:3000/users \
+curl -H "Auth: ..." -XPOST -H "Content-Type: application/json" http://localhost:3000/users \
 --data '{"email": "test@example.com", "name": "Newman", "password": "yolo1234"}'
 */
 router.post(
@@ -70,7 +68,7 @@ router.post(
 );
 
 /*
-curl -XPATCH -H "Content-Type: application/json" http://localhost:3000/users \
+curl -H "Auth: ..." -XPATCH -H "Content-Type: application/json" http://localhost:3000/users \
 --data '{"id": 1, "name": "new name"}'
 */
 router.patch(
@@ -115,7 +113,7 @@ router.patch(
 );
 
 /*
-curl -XDELETE -H "Content-Type: application/json" http://localhost:3000/users \
+curl -H "Auth: ..." -XDELETE -H "Content-Type: application/json" http://localhost:3000/users \
 --data '{"id": 1}'
 */
 router.delete(

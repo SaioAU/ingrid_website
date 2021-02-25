@@ -7,7 +7,8 @@
     "start": "ts-node-dev ./src/index.ts",
     "typeorm": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm",
     "test": "jest",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "createUser": "ts-node src/scripts/createUser.ts"
   },
   "author": "",
   "license": "ISC",
