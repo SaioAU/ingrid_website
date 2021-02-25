@@ -14,7 +14,9 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier",
+    "plugin:prettier/recommended"
   ],
   "settings": {
     "import/parsers": {
@@ -41,6 +43,13 @@
     "@typescript-eslint/no-misused-promises": [
       "error",
       { "checksVoidReturn": false }
-    ]
+    ],
+    "prettier/prettier": [
+      'warn',
+      {
+        singleQuote: true,
+        trailingComma: "all"
+      }
+    ],
   },
 }
