@@ -4,7 +4,14 @@ import jwt from 'jsonwebtoken';
 
 import { User } from '../entities';
 import { checkJwt } from './middlewares';
-import { getAccessTokenExpiration, getJwtSecret, hash } from '../utils';
+import {
+  getAccessTokenExpiration,
+  getJwtSecret,
+  getRefreshTokenExpiration,
+  hash,
+} from '../utils';
+
+// Nice intro to JWT auth: https://hasura.io/blog/best-practices-of-using-jwt-with-graphql/
 
 // For setting up user role checking see
 // https://js.plainenglish.io/creating-a-rest-api-with-jwt-authentication-and-role-based-authorization-using-typescript-fbfa3cab22a4
@@ -51,12 +58,24 @@ router.post(
       return;
     }
 
-    const token = jwt.sign({ userId: user.id, email: user.email }, jwtSecret, {
-      expiresIn: `${getAccessTokenExpiration()}m`,
-    });
+    const authToken = jwt.sign(
+      { userId: user.id, email: user.email },
+      jwtSecret,
+      {
+        expiresIn: getAccessTokenExpiration(),
+      },
+    );
 
-    // Send the jwt in the response
-    res.status(OK).send(token);
+    const refreshToken = jwt.sign(
+      { userId: user.id, email: user.email },
+      jwtSecret,
+      {
+        expiresIn: getRefreshTokenExpiration(),
+      },
+    );
+
+    // Send the jwts in the response
+    res.status(OK).json({ authToken, refreshToken });
   },
 );
 
@@ -90,6 +109,41 @@ router.patch(
     } catch (err) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not update user');
     }
+  },
+);
+
+router.get(
+  '/refresh-token',
+  [checkJwt],
+  async (_: Request, res: Response): Promise<void> => {
+    const jwtSecret = getJwtSecret();
+    const { userId } = res.locals.jwtPayload;
+    const user = await User.findOne({ id: userId });
+
+    if (!user) {
+      res.status(NOT_FOUND).send();
+      return;
+    }
+
+    const authToken = jwt.sign(
+      { userId: user.id, email: user.email },
+      jwtSecret,
+      {
+        expiresIn: getAccessTokenExpiration(),
+      },
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user.id, email: user.email },
+      jwtSecret,
+      {
+        expiresIn: getRefreshTokenExpiration(),
+      },
+    );
+
+    res.setHeader('authToken', authToken);
+    res.setHeader('refreshToken', refreshToken);
+    res.status(OK).send();
   },
 );
 

@@ -8,7 +8,7 @@ import app from '../../server';
 import intializeDB from '../../db';
 import { User } from '../../entities';
 import { hash } from '../../utils';
-import { createJwt, createUser, getToken } from '../../testUtils';
+import { createJwt, createUser, getTokens } from '../../testUtils';
 
 beforeAll(async () => {
   await intializeDB();
@@ -24,12 +24,12 @@ describe('Auth', () => {
         const hashedPassword = await hash(password);
         await createUser({ password: hashedPassword });
 
-        const { text: token } = await request(app)
+        const { body } = await request(app)
           .post('/auth/login')
           .send({ password })
           .expect(400);
 
-        expect(token).toBeFalsy();
+        expect(Object.keys(body)).toHaveLength(0);
       }),
     );
     test(
@@ -39,12 +39,12 @@ describe('Auth', () => {
         const hashedPassword = await hash(password);
         const user = await createUser({ password: hashedPassword });
 
-        const { text: token } = await request(app)
+        const { body } = await request(app)
           .post('/auth/login')
           .send({ email: user?.email })
           .expect(400);
 
-        expect(token).toBeFalsy();
+        expect(Object.keys(body)).toHaveLength(0);
       }),
     );
     test(
@@ -54,12 +54,12 @@ describe('Auth', () => {
         const hashedPassword = await hash(password);
         await createUser({ password: hashedPassword });
 
-        const { text: token } = await request(app)
+        const { body } = await request(app)
           .post('/auth/login')
           .send({ email: 'wrong.email@example.com', password })
           .expect(401);
 
-        expect(token).toBeFalsy();
+        expect(Object.keys(body)).toHaveLength(0);
       }),
     );
     test(
@@ -69,12 +69,12 @@ describe('Auth', () => {
         const hashedPassword = await hash(password);
         const user = await createUser({ password: hashedPassword });
 
-        const { text: token } = await request(app)
+        const { body } = await request(app)
           .post('/auth/login')
           .send({ email: user?.email, password: 'wrong password' })
           .expect(401);
 
-        expect(token).toBeFalsy();
+        expect(Object.keys(body)).toHaveLength(0);
       }),
     );
     test(
@@ -82,12 +82,17 @@ describe('Auth', () => {
       runInTransaction(async () => {
         const password = 'testPassword';
         const user = await createUser({ password });
-        const token = await getToken({ email: user?.email, password });
+        const { authToken, refreshToken } = await getTokens({
+          email: user?.email,
+          password,
+        });
 
-        expect(token).toBeTruthy();
+        expect(authToken).toBeTruthy();
+        expect(refreshToken).toBeTruthy();
       }),
     );
   });
+
   describe('reset password should', () => {
     test(
       'not reset password without auth',
@@ -127,6 +132,35 @@ describe('Auth', () => {
         expect(user?.password).toBeTruthy();
         expect(user?.password).not.toBe(originalPassword);
         expect(user?.password).not.toBe(newPassword); // Should be hashed
+      }),
+    );
+  });
+
+  describe('refresh token should', () => {
+    test(
+      'not return new tokens without auth',
+      runInTransaction(async () => {
+        const { headers } = await request(app)
+          .get('/auth/refresh-token')
+          .expect(401);
+
+        expect(headers.authtoken).toBeFalsy();
+        expect(headers.refreshtoken).toBeFalsy();
+      }),
+    );
+    test(
+      'return a new auth and refresh token',
+      runInTransaction(async () => {
+        const user = await createUser({});
+        const token = createJwt({ email: user?.email, userId: user?.id });
+
+        const { headers } = await request(app)
+          .get('/auth/refresh-token')
+          .set('auth', token)
+          .expect(200);
+
+        expect(headers.authtoken).toBeTruthy();
+        expect(headers.refreshtoken).toBeTruthy();
       }),
     );
   });

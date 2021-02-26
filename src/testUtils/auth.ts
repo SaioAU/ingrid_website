@@ -4,19 +4,19 @@ import jwt from 'jsonwebtoken';
 import app from '../server';
 import { getJwtSecret } from '../utils';
 
-export const getToken = async ({
+export const getTokens = async ({
   email,
   password,
 }: {
   email?: string;
   password?: string;
-}): Promise<string | undefined> => {
-  const { text: token } = await request(app)
+}): Promise<{ authToken?: string; refreshToken?: string }> => {
+  const { body } = await request(app)
     .post('/auth/login')
     .send({ email, password })
     .expect(200);
 
-  return token;
+  return { authToken: body?.authToken, refreshToken: body?.refreshToken };
 };
 
 export const createJwt = (payload: GenericObject): string => {

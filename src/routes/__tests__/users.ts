@@ -30,12 +30,12 @@ describe('Users', () => {
       }),
     );
     test(
-      'should return user',
+      'should return user and a new auth token',
       runInTransaction(async () => {
         const user = await createUser({});
         const token = createJwt({ email: user?.email, userId: user?.id });
 
-        const { body } = await request(app)
+        const { body, headers } = await request(app)
           .get('/users')
           .set('auth', token)
           .query({ id: user?.id })
@@ -43,6 +43,7 @@ describe('Users', () => {
 
         expect(body).toMatchObject({ ...(user ?? {}) });
         expect(body.password).toBeTruthy();
+        expect(headers.authtoken).toBeTruthy();
       }),
     );
     test(

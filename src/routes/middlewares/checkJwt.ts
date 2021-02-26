@@ -21,12 +21,12 @@ export default (req: Request, res: Response, next: NextFunction): void => {
 
   const { userId, username } = jwtPayload;
 
-  // The token is valid for 1 hour. We want to send a new token on every request
-  const newToken = jwt.sign({ userId, username }, jwtSecret, {
-    expiresIn: `${getAccessTokenExpiration()}m`,
+  // Return new token with every request
+  const authToken = jwt.sign({ userId, username }, jwtSecret, {
+    expiresIn: getAccessTokenExpiration(),
   });
 
-  res.setHeader('token', newToken);
+  res.setHeader('authToken', authToken);
 
   next();
 };

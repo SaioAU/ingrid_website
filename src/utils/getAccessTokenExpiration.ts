@@ -3,5 +3,5 @@ export default (): string => {
 
   if (!expiration) throw new Error('Missing Access token expiration');
 
-  return expiration;
+  return `${expiration}m`;
 };
