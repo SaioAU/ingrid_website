@@ -8,7 +8,7 @@ intializeDB()
   .then(async () => {
     const [, , name, email, password] = process.argv;
     const user = await User.createUser(name, email, password);
-    console.log('✅ Success! created', omit({ ...user }, ['password']));
+    console.log('✅ Success!', omit({ ...user }, ['password']));
   })
   .catch(() => {
     throw new Error('Could not create user');

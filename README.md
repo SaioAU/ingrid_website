@@ -23,3 +23,9 @@ Running migrations
 ```bash
 npm run typeorm migration:run
 ```
+
+Revert last migration
+
+```bash
+npm run typeorm migration:revert
+```
