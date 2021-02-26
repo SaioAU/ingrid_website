@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 import { User } from '../entities';
 import { checkJwt } from './middlewares';
-import { getJwtSecret, hash } from '../utils';
+import { getAccessTokenExpiration, getJwtSecret, hash } from '../utils';
 
 // For setting up user role checking see
 // https://js.plainenglish.io/creating-a-rest-api-with-jwt-authentication-and-role-based-authorization-using-typescript-fbfa3cab22a4
@@ -52,7 +52,7 @@ router.post(
     }
 
     const token = jwt.sign({ userId: user.id, email: user.email }, jwtSecret, {
-      expiresIn: '1h',
+      expiresIn: `${getAccessTokenExpiration()}m`,
     });
 
     // Send the jwt in the response

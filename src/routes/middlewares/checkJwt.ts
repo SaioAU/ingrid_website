@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-import { getJwtSecret } from '../../utils';
+import { getAccessTokenExpiration, getJwtSecret } from '../../utils';
 
 type JwtPayload = { userId: number; username: string };
 
@@ -23,7 +23,7 @@ export default (req: Request, res: Response, next: NextFunction): void => {
 
   // The token is valid for 1 hour. We want to send a new token on every request
   const newToken = jwt.sign({ userId, username }, jwtSecret, {
-    expiresIn: '1h',
+    expiresIn: `${getAccessTokenExpiration()}m`,
   });
 
   res.setHeader('token', newToken);
