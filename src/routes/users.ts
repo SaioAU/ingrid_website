@@ -2,7 +2,6 @@ import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { User } from '../entities';
-import { hash } from '../utils';
 import { checkJwt } from './middlewares';
 
 const router = Router();
@@ -78,7 +77,7 @@ router.patch(
     req: Request<GenericObject, GenericObject, UserInput>,
     res: Response,
   ): Promise<void> => {
-    const { id, email, name, password } = req.body;
+    const { id, email, name } = req.body;
 
     if (!id) {
       res.status(BAD_REQUEST).send('Missing id');
@@ -92,19 +91,8 @@ router.patch(
       return;
     }
 
-    let updatedPassword = user.password;
-
-    if (password) {
-      try {
-        updatedPassword = await hash(password);
-      } catch (err) {
-        res.status(INTERNAL_SERVER_ERROR).send('Could not update user');
-      }
-    }
-
     user.name = name ?? user.name;
     user.email = email ?? user.email;
-    user.password = updatedPassword;
 
     await user.save();
 

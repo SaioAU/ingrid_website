@@ -6,8 +6,9 @@ import {
 
 import app from '../../server';
 import intializeDB from '../../db';
+import { User } from '../../entities';
 import { hash } from '../../utils';
-import { createUser, getToken } from '../../testUtils';
+import { createJwt, createUser, getToken } from '../../testUtils';
 
 beforeAll(async () => {
   await intializeDB();
@@ -84,6 +85,48 @@ describe('Auth', () => {
         const token = await getToken({ email: user?.email, password });
 
         expect(token).toBeTruthy();
+      }),
+    );
+  });
+  describe('reset password should', () => {
+    test(
+      'not reset password without auth',
+      runInTransaction(async () => {
+        let user = await createUser({});
+        const originalPassword = user?.password;
+        const newPassword = 'new password';
+
+        await request(app)
+          .patch('/auth/reset-password')
+          .send({ password: newPassword })
+          .expect(401);
+
+        user = await User.findOne({ id: user?.id });
+
+        expect(user?.password).toBeTruthy();
+        expect(user?.password).toBe(originalPassword);
+        expect(user?.password).not.toBe(newPassword);
+      }),
+    );
+    test(
+      "reset a user's password",
+      runInTransaction(async () => {
+        let user = await createUser({});
+        const originalPassword = user?.password;
+        const newPassword = 'new password';
+        const token = createJwt({ email: user?.email, userId: user?.id });
+
+        await request(app)
+          .patch('/auth/reset-password')
+          .set('auth', token)
+          .send({ password: newPassword })
+          .expect(200);
+
+        user = await User.findOne({ id: user?.id });
+
+        expect(user?.password).toBeTruthy();
+        expect(user?.password).not.toBe(originalPassword);
+        expect(user?.password).not.toBe(newPassword); // Should be hashed
       }),
     );
   });
