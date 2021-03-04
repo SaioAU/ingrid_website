@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
+// import { getConnection } from 'typeorm';
 
 import { User } from '../entities';
 import { checkJwt } from './middlewares';
@@ -46,6 +47,8 @@ router.post(
       return;
     }
 
+    // const users = await User.find({ email });
+    // users.forEach((u) => User.delete(u));
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -75,7 +78,9 @@ router.post(
     );
 
     // Send the jwts in the response
-    res.status(OK).json({ authToken, refreshToken });
+    res.setHeader('authToken', authToken);
+    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+    res.status(OK).send();
   },
 );
 
@@ -117,6 +122,9 @@ router.get(
   [checkJwt],
   async (_: Request, res: Response): Promise<void> => {
     const jwtSecret = getJwtSecret();
+    const accessTokenExpiration = getAccessTokenExpiration();
+    const refreshTokenExpiration = getRefreshTokenExpiration();
+
     const { userId } = res.locals.jwtPayload;
     const user = await User.findOne({ id: userId });
 
@@ -129,7 +137,7 @@ router.get(
       { userId: user.id, email: user.email },
       jwtSecret,
       {
-        expiresIn: getAccessTokenExpiration(),
+        expiresIn: accessTokenExpiration,
       },
     );
 
@@ -137,12 +145,12 @@ router.get(
       { userId: user.id, email: user.email },
       jwtSecret,
       {
-        expiresIn: getRefreshTokenExpiration(),
+        expiresIn: refreshTokenExpiration,
       },
     );
 
     res.setHeader('authToken', authToken);
-    res.setHeader('refreshToken', refreshToken);
+    res.cookie('refreshToken', refreshToken, { httpOnly: true });
     res.status(OK).send();
   },
 );

@@ -24,9 +24,9 @@ router.get(
   '/',
   [checkJwt],
   async (req: Request, res: Response): Promise<void> => {
-    const id = Number(req.query.id);
+    const { id } = req.query;
 
-    if (!id) {
+    if (typeof id !== 'string') {
       res.status(BAD_REQUEST).send('Missing id');
       return;
     }
@@ -79,7 +79,7 @@ router.patch(
   ): Promise<void> => {
     const { id, email, name } = req.body;
 
-    if (!id) {
+    if (typeof id !== 'string') {
       res.status(BAD_REQUEST).send('Missing id');
       return;
     }
@@ -113,7 +113,7 @@ router.delete(
   ): Promise<void> => {
     const { id } = req.body;
 
-    if (!id) {
+    if (typeof id !== 'string') {
       res.status(BAD_REQUEST).send('Missing id');
       return;
     }

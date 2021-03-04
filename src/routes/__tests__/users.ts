@@ -1,17 +1,18 @@
 import request from 'supertest';
 import {
-  initialiseTestTransactions,
-  runInTransaction,
-} from 'typeorm-test-transactions';
+  initializeTransactionalContext,
+  patchTypeORMRepositoryWithBaseRepository,
+} from 'typeorm-transactional-cls-hooked';
 
 import app from '../../server';
 import { User } from '../../entities';
 import intializeDB from '../../db';
-import { createJwt, createUser } from '../../testUtils';
+import { createJwt, createUser, runInTransaction } from '../../testUtils';
 
 beforeAll(async () => {
   await intializeDB();
-  initialiseTestTransactions();
+  initializeTransactionalContext();
+  patchTypeORMRepositoryWithBaseRepository();
 });
 
 describe('Users', () => {
@@ -74,9 +75,14 @@ describe('Users', () => {
   });
 
   describe('post', () => {
-    test(
+    test.only(
       'should not create user without auth',
       runInTransaction(async () => {
+        // FIXME: have to set up db so that this isn't necessary. Shouldn't transaction
+        // take care of it? also: run migrations etc each test run seems to be necessary;
+        // something like setup-db in https://github.com/typeorm/typeorm/issues/5308#issuecomment-653275643
+        const users = await User.find({ email: 'test@example.com' });
+        users.forEach((u) => User.delete(u));
         expect(await User.find({})).toHaveLength(0);
 
         const { body } = await request(app)

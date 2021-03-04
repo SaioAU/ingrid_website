@@ -25,7 +25,7 @@
     "ts-node": "^9.1.1",
     "tsconfig-paths": "^3.9.0",
     "typeorm": "^0.2.31",
-    "typeorm-test-transactions": "^1.14.2",
+    "typeorm-transactional-cls-hooked": "^0.1.20",
     "typescript": "^4.1.5"
   },
   "devDependencies": {

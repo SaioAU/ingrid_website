@@ -1,18 +1,19 @@
 import request from 'supertest';
 import {
-  initialiseTestTransactions,
-  runInTransaction,
-} from 'typeorm-test-transactions';
+  initializeTransactionalContext,
+  patchTypeORMRepositoryWithBaseRepository,
+} from 'typeorm-transactional-cls-hooked';
 
 import app from '../../server';
 import intializeDB from '../../db';
 import { User } from '../../entities';
 import { hash } from '../../utils';
-import { createJwt, createUser, getTokens } from '../../testUtils';
+import { createJwt, createUser, runInTransaction } from '../../testUtils';
 
 beforeAll(async () => {
   await intializeDB();
-  initialiseTestTransactions();
+  initializeTransactionalContext();
+  patchTypeORMRepositoryWithBaseRepository();
 });
 
 describe('Auth', () => {
@@ -24,12 +25,13 @@ describe('Auth', () => {
         const hashedPassword = await hash(password);
         await createUser({ password: hashedPassword });
 
-        const { body } = await request(app)
+        const { headers } = await request(app)
           .post('/auth/login')
           .send({ password })
           .expect(400);
 
-        expect(Object.keys(body)).toHaveLength(0);
+        expect(headers.authtoken).toBeFalsy();
+        expect(headers['set-cookie']).toBeFalsy();
       }),
     );
     test(
@@ -39,12 +41,13 @@ describe('Auth', () => {
         const hashedPassword = await hash(password);
         const user = await createUser({ password: hashedPassword });
 
-        const { body } = await request(app)
+        const { headers } = await request(app)
           .post('/auth/login')
           .send({ email: user?.email })
           .expect(400);
 
-        expect(Object.keys(body)).toHaveLength(0);
+        expect(headers.authtoken).toBeFalsy();
+        expect(headers['set-cookie']).toBeFalsy();
       }),
     );
     test(
@@ -54,12 +57,13 @@ describe('Auth', () => {
         const hashedPassword = await hash(password);
         await createUser({ password: hashedPassword });
 
-        const { body } = await request(app)
+        const { headers } = await request(app)
           .post('/auth/login')
           .send({ email: 'wrong.email@example.com', password })
           .expect(401);
 
-        expect(Object.keys(body)).toHaveLength(0);
+        expect(headers.authtoken).toBeFalsy();
+        expect(headers['set-cookie']).toBeFalsy();
       }),
     );
     test(
@@ -82,13 +86,16 @@ describe('Auth', () => {
       runInTransaction(async () => {
         const password = 'testPassword';
         const user = await createUser({ password });
-        const { authToken, refreshToken } = await getTokens({
-          email: user?.email,
-          password,
-        });
+        const { headers } = await request(app)
+          .post('/auth/login')
+          .send({ email: user?.email, password })
+          .expect(200);
 
-        expect(authToken).toBeTruthy();
-        expect(refreshToken).toBeTruthy();
+        expect(headers.authtoken).toEqual(expect.stringMatching(/^ey.+/i));
+        expect(headers['set-cookie']).toHaveLength(1);
+        expect(headers['set-cookie'][0]).toEqual(
+          expect.stringMatching(/^refreshToken=ey.+HttpOnly$/i),
+        );
       }),
     );
   });
@@ -145,7 +152,7 @@ describe('Auth', () => {
           .expect(401);
 
         expect(headers.authtoken).toBeFalsy();
-        expect(headers.refreshtoken).toBeFalsy();
+        expect(headers['set-cookie']).toBeFalsy();
       }),
     );
     test(
@@ -159,8 +166,11 @@ describe('Auth', () => {
           .set('auth', token)
           .expect(200);
 
-        expect(headers.authtoken).toBeTruthy();
-        expect(headers.refreshtoken).toBeTruthy();
+        expect(headers.authtoken).toEqual(expect.stringMatching(/^ey.+/i));
+        expect(headers['set-cookie']).toHaveLength(1);
+        expect(headers['set-cookie'][0]).toEqual(
+          expect.stringMatching(/^refreshToken=ey.+HttpOnly$/i),
+        );
       }),
     );
   });

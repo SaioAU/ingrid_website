@@ -1,6 +1,12 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  BaseEntity,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  getConnection,
+} from 'typeorm';
 
-import { hash } from '../utils';
+import { getConnectionName, hash } from '../utils';
 
 @Entity()
 class User extends BaseEntity {
@@ -23,6 +29,7 @@ class User extends BaseEntity {
 
       return hashedPassword === this.password;
     } catch (err) {
+      console.error(err);
       return false;
     }
   }
