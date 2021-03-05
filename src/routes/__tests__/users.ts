@@ -3,7 +3,7 @@ import request from 'supertest';
 import app from '../../server';
 import { User } from '../../entities';
 import intializeDB from '../../db';
-import { clearDB, createJwt, createUser } from '../../testUtils';
+import { clearDB, createJwt, createUser, sleep } from '../../testUtils';
 
 beforeAll(async () => {
   await intializeDB();
@@ -18,12 +18,27 @@ describe('Users', () => {
     test('should not return user without auth', async () => {
       const user = await createUser({});
 
-      const { body } = await request(app)
+      const { body, headers } = await request(app)
         .get('/users')
         .query({ id: user?.id })
         .expect(401);
 
       expect(body).toMatchObject({});
+      expect(headers.authtoken).toBeFalsy();
+    });
+    test('should not return user with an expired token', async () => {
+      const user = await createUser({});
+      const token = createJwt({ email: user?.email, userId: user?.id }, 1);
+      await sleep(2000);
+
+      const { body, headers } = await request(app)
+        .get('/users')
+        .set('auth', token)
+        .query({ id: user?.id })
+        .expect(401);
+
+      expect(body).toMatchObject({});
+      expect(headers.authtoken).toBeFalsy();
     });
     test('should return user and a new auth token', async () => {
       const user = await createUser({});

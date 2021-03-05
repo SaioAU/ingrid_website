@@ -130,7 +130,14 @@ router.get(
       return;
     }
 
-    const { userId } = jwt.verify(refreshToken, jwtSecret) as JwtPayload;
+    let userId;
+
+    try {
+      userId = (jwt.verify(refreshToken, jwtSecret) as JwtPayload).userId;
+    } catch (err) {
+      res.status(UNAUTHORIZED).send();
+      return;
+    }
 
     const user = await User.findOne({ id: userId.toString() });
 

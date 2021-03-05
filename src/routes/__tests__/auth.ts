@@ -4,7 +4,7 @@ import app from '../../server';
 import intializeDB from '../../db';
 import { User } from '../../entities';
 import { hash } from '../../utils';
-import { clearDB, createJwt, createUser } from '../../testUtils';
+import { clearDB, createJwt, createUser, sleep } from '../../testUtils';
 
 beforeAll(async () => {
   await intializeDB();
@@ -124,6 +124,19 @@ describe('Auth', () => {
     test('not return new tokens without auth cookie', async () => {
       const { headers } = await request(app)
         .get('/auth/refresh-token')
+        .expect(401);
+
+      expect(headers.authtoken).toBeFalsy();
+      expect(headers['set-cookie']).toBeFalsy();
+    });
+    test('not return new tokens with expired auth', async () => {
+      const user = await createUser({});
+      const token = createJwt({ email: user?.email, userId: user?.id }, 1);
+      await sleep(2000);
+
+      const { headers } = await request(app)
+        .get('/auth/refresh-token')
+        .set('Cookie', [`refreshToken=${token}`])
         .expect(401);
 
       expect(headers.authtoken).toBeFalsy();
