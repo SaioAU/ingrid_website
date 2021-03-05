@@ -119,21 +119,27 @@ router.patch(
 
 router.get(
   '/refresh-token',
-  [checkJwt],
-  async (_: Request, res: Response): Promise<void> => {
+  async (req: Request, res: Response): Promise<void> => {
     const jwtSecret = getJwtSecret();
     const accessTokenExpiration = getAccessTokenExpiration();
     const refreshTokenExpiration = getRefreshTokenExpiration();
+    const { refreshToken } = req.cookies;
 
-    const { userId } = res.locals.jwtPayload;
-    const user = await User.findOne({ id: userId });
+    if (!refreshToken) {
+      res.status(UNAUTHORIZED).send();
+      return;
+    }
+
+    const { userId } = jwt.verify(refreshToken, jwtSecret) as JwtPayload;
+
+    const user = await User.findOne({ id: userId.toString() });
 
     if (!user) {
       res.status(NOT_FOUND).send();
       return;
     }
 
-    const authToken = jwt.sign(
+    const newAuthToken = jwt.sign(
       { userId: user.id, email: user.email },
       jwtSecret,
       {
@@ -141,7 +147,7 @@ router.get(
       },
     );
 
-    const refreshToken = jwt.sign(
+    const newRefreshToken = jwt.sign(
       { userId: user.id, email: user.email },
       jwtSecret,
       {
@@ -149,8 +155,8 @@ router.get(
       },
     );
 
-    res.setHeader('authToken', authToken);
-    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+    res.setHeader('authToken', newAuthToken);
+    res.cookie('refreshToken', newRefreshToken, { httpOnly: true });
     res.status(OK).send();
   },
 );

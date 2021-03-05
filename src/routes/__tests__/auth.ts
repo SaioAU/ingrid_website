@@ -121,7 +121,7 @@ describe('Auth', () => {
   });
 
   describe('refresh token should', () => {
-    test('not return new tokens without auth', async () => {
+    test('not return new tokens without auth cookie', async () => {
       const { headers } = await request(app)
         .get('/auth/refresh-token')
         .expect(401);
@@ -135,7 +135,7 @@ describe('Auth', () => {
 
       const { headers } = await request(app)
         .get('/auth/refresh-token')
-        .set('auth', token)
+        .set('Cookie', [`refreshToken=${token}`])
         .expect(200);
 
       expect(headers.authtoken).toEqual(expect.stringMatching(/^ey.+/i));

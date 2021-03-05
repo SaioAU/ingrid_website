@@ -6,3 +6,5 @@ declare type UserInput = {
   name?: string;
   password?: string;
 };
+
+declare type JwtPayload = { userId: number; username: string };

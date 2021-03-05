@@ -5,12 +5,12 @@ import intializeDB from './db';
 
 dotenv.config();
 
-const port = Number(process.env.PORT || 3000);
+const port = Number(process.env.PORT || 3003);
 
 intializeDB()
   .then(() => {
     app.listen(port, () => {
-      // logger.info(`Express server started on port: ${port}`);
+      // eslint-disable-next-line no-console
       console.log(`Express server started on port: ${port}`);
     });
   })

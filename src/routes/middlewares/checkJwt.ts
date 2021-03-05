@@ -3,8 +3,6 @@ import jwt from 'jsonwebtoken';
 
 import { getAccessTokenExpiration, getJwtSecret } from '../../utils';
 
-type JwtPayload = { userId: number; username: string };
-
 export default (req: Request, res: Response, next: NextFunction): void => {
   const jwtSecret = getJwtSecret();
   const token = req.headers.auth as string;
