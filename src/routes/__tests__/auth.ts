@@ -104,7 +104,7 @@ describe('Auth', () => {
       let user = await createUser({});
       const originalPassword = user?.password;
       const newPassword = 'new password';
-      const token = createJwt({ email: user?.email, userId: user?.id });
+      const token = createJwt({ userId: user?.id, tokenType: 'access' });
 
       await request(app)
         .patch('/auth/reset-password')
@@ -131,7 +131,7 @@ describe('Auth', () => {
     });
     test('not return new tokens with expired auth', async () => {
       const user = await createUser({});
-      const token = createJwt({ email: user?.email, userId: user?.id }, 1);
+      const token = createJwt({ userId: user?.id, tokenType: 'refresh' }, 1);
       await sleep(2000);
 
       const { headers } = await request(app)
@@ -144,7 +144,7 @@ describe('Auth', () => {
     });
     test('return a new auth and refresh token', async () => {
       const user = await createUser({});
-      const token = createJwt({ email: user?.email, userId: user?.id });
+      const token = createJwt({ userId: user?.id, tokenType: 'refresh' });
 
       const { headers } = await request(app)
         .get('/auth/refresh-token')

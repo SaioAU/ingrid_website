@@ -59,7 +59,7 @@ router.post(
     }
 
     const authToken = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, tokenType: 'access' },
       jwtSecret,
       {
         expiresIn: getAccessTokenExpiration(),
@@ -67,7 +67,7 @@ router.post(
     );
 
     const refreshToken = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, tokenType: 'refresh' },
       jwtSecret,
       {
         expiresIn: getRefreshTokenExpiration(),
@@ -144,7 +144,7 @@ router.get(
     }
 
     const newAuthToken = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, tokenType: 'access' },
       jwtSecret,
       {
         expiresIn: accessTokenExpiration,
@@ -152,7 +152,7 @@ router.get(
     );
 
     const newRefreshToken = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.id, tokenType: 'refresh' },
       jwtSecret,
       {
         expiresIn: refreshTokenExpiration,

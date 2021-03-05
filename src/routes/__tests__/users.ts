@@ -28,7 +28,7 @@ describe('Users', () => {
     });
     test('should not return user with an expired token', async () => {
       const user = await createUser({});
-      const token = createJwt({ email: user?.email, userId: user?.id }, 1);
+      const token = createJwt({ userId: user?.id, tokenType: 'access' }, 1);
       await sleep(2000);
 
       const { body, headers } = await request(app)
@@ -42,7 +42,7 @@ describe('Users', () => {
     });
     test('should return user and a new auth token', async () => {
       const user = await createUser({});
-      const token = createJwt({ email: user?.email, userId: user?.id });
+      const token = createJwt({ userId: user?.id, tokenType: 'access' });
 
       const { body, headers } = await request(app)
         .get('/users')
@@ -66,7 +66,7 @@ describe('Users', () => {
         email: 'user2@example.com',
         password: 'password2',
       });
-      const token = createJwt({ email: user1?.email, userId: user1?.id });
+      const token = createJwt({ userId: user1?.id, tokenType: 'access' });
       const { body } = await request(app)
         .get('/users/all')
         .set('auth', token)
@@ -94,10 +94,7 @@ describe('Users', () => {
     test('should create user with hashed password', async () => {
       expect(await User.find({})).toHaveLength(0);
       const anotherUser = await createUser({});
-      const token = createJwt({
-        email: anotherUser?.email,
-        userId: anotherUser?.id,
-      });
+      const token = createJwt({ userId: anotherUser?.id, tokenType: 'access' });
 
       const { body } = await request(app)
         .post('/users')
@@ -146,7 +143,7 @@ describe('Users', () => {
     });
     test('should update user with hashed password', async () => {
       let user: User | undefined = await createUser({});
-      const token = createJwt({ email: user?.email, userId: user?.id });
+      const token = createJwt({ userId: user?.id, tokenType: 'access' });
       const originalEmail = user?.email;
       const newName = 'new name';
 
@@ -188,7 +185,7 @@ describe('Users', () => {
     });
     test('should delete user', async () => {
       const user = await createUser({});
-      const token = createJwt({ email: user?.email, userId: user?.id });
+      const token = createJwt({ userId: user?.id, tokenType: 'access' });
       expect(await User.find({})).toHaveLength(1);
 
       const { body } = await request(app)
