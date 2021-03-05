@@ -1,3 +1,8 @@
+## Setup
+
+- Set up env: `cp .env.default .env` and then update variables in `.env`
+- Install: `npm install`
+
 ## Run
 
 Start dev server: `npm start`
