@@ -1,3 +1,9 @@
+## Run
+
+Start dev server: `npm start`
+
+Set port through env variable `PORT` (default: 3003)
+
 ## Authentication
 
 Uses JSON web tokens. Auth token sent in header as `auth` and refresh token in http only cookie.
