@@ -1,5 +1,9 @@
 import 'reflect-metadata';
 import { createConnection, getConnection, getConnectionOptions } from 'typeorm';
+import {
+  initializeTransactionalContext,
+  patchTypeORMRepositoryWithBaseRepository,
+} from 'typeorm-transactional-cls-hooked';
 
 import { User } from './entities';
 import { getConnectionName } from './utils';
@@ -12,6 +16,9 @@ const intializeDB = async (): Promise<void> => {
 
   // Since we are using several connections https://github.com/typeorm/typeorm/issues/2715#issuecomment-465322936
   User.useConnection(getConnection(name));
+
+  initializeTransactionalContext();
+  patchTypeORMRepositoryWithBaseRepository();
 };
 
 export default intializeDB;

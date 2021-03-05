@@ -4,12 +4,12 @@ import jwt from 'jsonwebtoken';
 // import { getConnection } from 'typeorm';
 
 import { User } from '../entities';
+import { UserController } from '../controllers';
 import { checkJwt } from './middlewares';
 import {
   getAccessTokenExpiration,
   getJwtSecret,
   getRefreshTokenExpiration,
-  hash,
 } from '../utils';
 
 // Nice intro to JWT auth: https://hasura.io/blog/best-practices-of-using-jwt-with-graphql/
@@ -106,14 +106,14 @@ router.patch(
       return;
     }
 
-    try {
-      const hashedPassword = await hash(password);
-      user.password = hashedPassword;
-      await user.save();
-      res.status(OK).send('Password updated');
-    } catch (err) {
+    const err = await UserController.resetPassword(user, password);
+
+    if (err) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not update user');
+      return;
     }
+
+    res.status(OK).send('Password updated');
   },
 );
 

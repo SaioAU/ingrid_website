@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { User } from '../entities';
+import { UserController } from '../controllers';
 import { checkJwt } from './middlewares';
 
 const router = Router();
@@ -55,7 +56,7 @@ router.post(
       return;
     }
 
-    const user = await User.createUser(name, email, password);
+    const user = await UserController.create(name, email, password);
 
     if (!user) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not create user');
@@ -91,10 +92,7 @@ router.patch(
       return;
     }
 
-    user.name = name ?? user.name;
-    user.email = email ?? user.email;
-
-    await user.save();
+    await UserController.update(user, name, email);
 
     res.status(OK).json(user);
   },
@@ -125,7 +123,7 @@ router.delete(
       return;
     }
 
-    await user.remove();
+    await UserController.delete(user);
 
     res.status(OK).json({ id });
   },
