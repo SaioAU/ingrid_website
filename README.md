@@ -1,3 +1,7 @@
+## Authentication
+
+Uses JSON web tokens. Auth token sent in header as `auth` and refresh token in http only cookie.
+
 ## Create user
 
 You need a user to do anything since endpoints are authenticated. This can be done with a script:
@@ -29,3 +33,24 @@ Revert last migration
 ```bash
 npm run typeorm migration:revert
 ```
+
+## Routes
+
+Two main routes:
+
+- /auth
+  - /login POST
+  - /reset-password PATCH
+  - /refresh-token GET
+- /users
+  - /all GET
+  - / GET
+  - / POST
+  - / PATCH
+  - / DELETE
+
+## Tests
+
+Run with `npm test`
+
+Uses a different database connection, identified by `NODE_ENV=test`
