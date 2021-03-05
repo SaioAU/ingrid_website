@@ -1,7 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import jwt from 'jsonwebtoken';
-// import { getConnection } from 'typeorm';
 
 import { User } from '../entities';
 import { UserController } from '../controllers';
@@ -47,8 +46,6 @@ router.post(
       return;
     }
 
-    // const users = await User.find({ email });
-    // users.forEach((u) => User.delete(u));
     const user = await User.findOne({ email });
 
     if (!user) {
