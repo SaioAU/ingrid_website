@@ -4,7 +4,7 @@ export default [
     name: 'default',
     host: 'localhost',
     port: 5432,
-    username: 'postgres',
+    username: 'saioaarosteguiurrutia',
     synchronize: false,
     migrationsRun: true,
     logging: false,
@@ -16,6 +16,7 @@ export default [
       migrationsDir: 'src/migrations',
       subscribersDir: 'src/subscribers',
     },
+    database: "ingrid_website",
   },
   {
     type: 'postgres',

@@ -5,7 +5,7 @@ import intializeDB from './db';
 
 dotenv.config();
 
-const port = Number(process.env.PORT || 3003);
+const port = Number(process.env.PORT || 3000);
 
 intializeDB()
   .then(() => {

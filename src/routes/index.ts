@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import AuthRouter from './auth';
 import UserRouter from './users';
+import ProductsRouter from './products'
 
 const router = Router();
 
@@ -18,5 +19,7 @@ router.get('/healthcheck', (_: Request, res: Response): void => {
 router.use('/users', UserRouter);
 
 router.use('/auth', AuthRouter);
+
+router.use('/products', ProductsRouter);
 
 export default router;
