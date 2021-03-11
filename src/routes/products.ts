@@ -2,7 +2,6 @@ import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { Product } from '../entities';
-import { UserController } from '../controllers';
 import { checkJwt } from './middlewares';
 
 const router = Router();
@@ -99,14 +98,14 @@ router.patch(
 );
 
 /*
-curl -H "Auth: ..." -XDELETE -H "Content-Type: application/json" http://localhost:3000/users \
+curl -H "Auth: ..." -XDELETE -H "Content-Type: application/json" http://localhost:3000/products \
 --data '{"id": 1}'
 */
 router.delete(
   '/',
   [checkJwt],
   async (
-    req: Request<GenericObject, GenericObject, UserInput>,
+    req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
   ): Promise<void> => {
     const { id } = req.body;
@@ -116,14 +115,14 @@ router.delete(
       return;
     }
 
-    const user = await User.findOne({ id });
+    const product = await Product.findOne({ id });
 
-    if (!user) {
-      res.status(NOT_FOUND).send('User not found');
+    if (!product) {
+      res.status(NOT_FOUND).send('Product not found');
       return;
     }
 
-    await UserController.delete(user);
+    await Product.delete(product);
 
     res.status(OK).json({ id });
   },

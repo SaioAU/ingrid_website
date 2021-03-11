@@ -6,8 +6,8 @@ import { omit } from '../utils';
 
 intializeDB()
   .then(async () => {
-    const [, , name, email, password] = process.argv;
-    const product = await Product.createProduct(name, email, password);
+    const [colour, size, name, description, price, category] = process.argv;
+    const product = await Product.createProduct(name, description, colour, size, price, category);
     console.log('✅ Success!', omit({ ...product }, ['password']));
   })
   .catch(() => {
