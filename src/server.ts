@@ -9,7 +9,13 @@ const app = express();
 
 app.use(helmet());
 
-app.use(cors({ exposedHeaders: ['authToken'] }));
+app.use(
+  cors({
+    exposedHeaders: ['authToken'],
+    origin: 'http://localhost:3004', // TODO: env
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 
