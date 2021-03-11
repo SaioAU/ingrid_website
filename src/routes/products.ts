@@ -10,7 +10,7 @@ const { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK } = StatusCodes;
 
 // curl -H "Auth: ..." http://localhost:3000/products/all
 router.get(
-  '/all',
+  '/read/all',
   [checkJwt],
   async (_: Request, res: Response): Promise<void> => {
     const products = await Product.find();
@@ -21,7 +21,7 @@ router.get(
 
 // curl -H "Auth: ..." http://localhost:3000/products?id=1
 router.get(
-  '/',
+  '/read',
   [checkJwt],
   async (req: Request, res: Response): Promise<void> => {
     const { id } = req.query;
@@ -39,10 +39,10 @@ router.get(
 
 /*
 curl -H "Auth: ..." -XPOST -H "Content-Type: application/json" http://localhost:3000/products \
---data '{"category": "handbag", "name": "classy", "size": "big", "price": "expensive", "colour": "blue", "description": "awesome"}'
+--data '{"category": "handbag", "name": "classy", "size": "big", "price": 1000, "colour": "blue", "description": "awesome"}'
 */
 router.post(
-  '/',
+  '/create',
   [checkJwt],
   async (
     req: Request<GenericObject, GenericObject, ProductInput>,
@@ -55,7 +55,7 @@ router.post(
       return;
     }
 
-    const product = await Product.create(category, description, name, colour, price, size);
+    const product = await Product.createProduct(name, category, size, colour, description, 1000);
 
     if (!product) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not create product');
@@ -71,7 +71,7 @@ curl -H "Auth: ..." -XPATCH -H "Content-Type: application/json" http://localhost
 --data '{"id": 1, "name": "new name"}'
 */
 router.patch(
-  '/',
+  '/update',
   [checkJwt],
   async (
     req: Request<GenericObject, GenericObject, ProductInput>,
@@ -84,6 +84,36 @@ router.patch(
       return;
     }
 
+    if(typeof category !== 'string'){
+        res.status(BAD_REQUEST).send('Missing category');
+      return;
+    }
+
+    if(typeof description !== 'string'){
+        res.status(BAD_REQUEST).send('Missing description');
+      return;
+    }
+
+    if(typeof name !== 'string'){
+        res.status(BAD_REQUEST).send('Missing name');
+      return;
+    }
+
+    if(typeof colour !== 'string'){
+        res.status(BAD_REQUEST).send('Missing colour');
+      return;
+    }
+
+    if(typeof price !== 'number'){
+        res.status(BAD_REQUEST).send('Missing price');
+      return;
+    }
+
+    if(typeof size !== 'string'){
+        res.status(BAD_REQUEST).send('Missing size');
+      return;
+    }
+
     const product = await Product.findOne({ id });
 
     if (!product) {
@@ -91,7 +121,12 @@ router.patch(
       return;
     }
 
-    await Product.update(category, description, name, colour, price, size);
+    product.category = category
+    product.colour = colour
+    product.description = description
+    product.size = size
+    product.name = name
+    product.price = price
 
     res.status(OK).json(product);
   },
@@ -102,7 +137,7 @@ curl -H "Auth: ..." -XDELETE -H "Content-Type: application/json" http://localhos
 --data '{"id": 1}'
 */
 router.delete(
-  '/',
+  '/delete',
   [checkJwt],
   async (
     req: Request<GenericObject, GenericObject, ProductInput>,
