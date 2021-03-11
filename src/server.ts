@@ -11,6 +11,7 @@ app.use(helmet());
 
 app.use(
   cors({
+    allowedHeaders: ['auth'],
     exposedHeaders: ['authToken'],
     origin: 'http://localhost:3004', // TODO: env
     credentials: true,

@@ -8,3 +8,5 @@ declare type UserInput = {
 };
 
 declare type JwtPayload = { userId: number; username: string };
+
+declare type UserTakeout = { name: string; email: string; id: string };
