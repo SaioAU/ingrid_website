@@ -8,3 +8,15 @@ declare type UserInput = {
 };
 
 declare type JwtPayload = { userId: number; username: string };
+
+
+declare type ProductInput = {
+  id?: number;
+  category?: string;
+  name?: string;
+  colour?: string;
+  description?: string;
+  price?: string;
+  size?: string;
+};
+

@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { User } from '../entities';
+import { Product } from '../entities';
 import { UserController } from '../controllers';
 import { checkJwt } from './middlewares';
 
@@ -9,14 +9,14 @@ const router = Router();
 
 const { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK } = StatusCodes;
 
-// curl -H "Auth: ..." http://localhost:3000/users/all
+// curl -H "Auth: ..." http://localhost:3000/products/all
 router.get(
   '/all',
   [checkJwt],
   async (_: Request, res: Response): Promise<void> => {
-    const users = await User.find();
+    const products = await Product.find();
 
-    res.status(OK).json(users);
+    res.status(OK).json(products);
   },
 );
 
@@ -39,62 +39,62 @@ router.get(
 );
 
 /*
-curl -H "Auth: ..." -XPOST -H "Content-Type: application/json" http://localhost:3000/users \
---data '{"email": "test@example.com", "name": "Newman", "password": "yolo1234"}'
+curl -H "Auth: ..." -XPOST -H "Content-Type: application/json" http://localhost:3000/products \
+--data '{"category": "handbag", "name": "classy", "size": "big", "price": "expensive", "colour": "blue", "description": "awesome"}'
 */
 router.post(
   '/',
   [checkJwt],
   async (
-    req: Request<GenericObject, GenericObject, UserInput>,
+    req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
   ): Promise<void> => {
-    const { email, name, password } = req.body;
+    const { category, description, name, colour, price, size } = req.body;
 
-    if (!category || !name || !password) {
+    if (!category || !description || !name || !colour || !price || !size ) {
       res.status(BAD_REQUEST).send('Missing email, name or password');
       return;
     }
 
-    const user = await UserController.create(name, email, password);
+    const product = await Product.create(category, description, name, colour, price, size);
 
-    if (!user) {
-      res.status(INTERNAL_SERVER_ERROR).send('Could not create user');
+    if (!product) {
+      res.status(INTERNAL_SERVER_ERROR).send('Could not create product');
       return;
     }
 
-    res.status(OK).json(user);
+    res.status(OK).json(product);
   },
 );
 
 /*
-curl -H "Auth: ..." -XPATCH -H "Content-Type: application/json" http://localhost:3000/users \
+curl -H "Auth: ..." -XPATCH -H "Content-Type: application/json" http://localhost:3000/products \
 --data '{"id": 1, "name": "new name"}'
 */
 router.patch(
   '/',
   [checkJwt],
   async (
-    req: Request<GenericObject, GenericObject, UserInput>,
+    req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
   ): Promise<void> => {
-    const { id, email, name } = req.body;
+    const { id, category, description, name, colour, price, size } = req.body;
 
     if (typeof id !== 'string') {
       res.status(BAD_REQUEST).send('Missing id');
       return;
     }
 
-    const user = await User.findOne({ id });
+    const product = await Product.findOne({ id });
 
-    if (!user) {
-      res.status(NOT_FOUND).send('User not found');
+    if (!product) {
+      res.status(NOT_FOUND).send('Product not found');
       return;
     }
 
-    await UserController.update(user, name, email);
+    await Product.update(category, description, name, colour, price, size);
 
-    res.status(OK).json(user);
+    res.status(OK).json(product);
   },
 );
 
