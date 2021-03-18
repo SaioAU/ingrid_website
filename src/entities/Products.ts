@@ -26,20 +26,34 @@ import {
     @Column()
     price: number;
 
+    @Column()
+    material: string;
+
+    @Column()
+    care: string;
+
     @Column({
         nullable: true,
     })
-    size: string; 
+    size: number; 
+
+    @Column({
+      nullable: true,
+  })
+  season: string;
 
     // this function needs to  be restricted to ingrid, how do i check if user logged in first?
   
     static async createProduct(
     name: string,
     category: string,
-    size: string,
+    size: number,
     colour: string,
     description: string,
     price: number,
+    material: string,
+    care: string,
+    season: string,
   ): Promise<Product | undefined> {
     const product = new Product();
     product.name = name;
@@ -47,7 +61,10 @@ import {
     product.size = size;
     product.price = price;
     product.description = description;
-    product.colour = colour
+    product.colour = colour;
+    product.material = material;
+    product.care = care;
+    product.season  = season;
 
     await product.save();
     return product;

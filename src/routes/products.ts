@@ -39,7 +39,7 @@ router.get(
 
 /*
 curl -H "Auth: ..." -XPOST -H "Content-Type: application/json" http://localhost:3000/products \
---data '{"category": "handbag", "name": "classy", "size": "big", "price": 1000, "colour": "blue", "description": "awesome"}'
+--data '{"category": "handbag", "name": "classy", "size": "big", "price": 1000, "colour": "blue", "description": "awesome", "material": "cotton", "care": "handwashed", "season": "summer"}'
 */
 router.post(
   '/create',
@@ -48,14 +48,14 @@ router.post(
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
   ): Promise<void> => {
-    const { category, description, name, colour, price, size } = req.body;
+    const { category, description, name, colour, price, size, material, care,  season} = req.body;
 
-    if (!category || !description || !name || !colour || !price || !size ) {
+    if (!category || !description || !name || !colour || !price || !size || !material || !care || !season) {
       res.status(BAD_REQUEST).send('Missing email, name or password');
       return;
     }
 
-    const product = await Product.createProduct(name, category, size, colour, description, 1000);
+    const product = await Product.createProduct(name, category, 38, colour, description, 1000, material, care, season);
 
     if (!product) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not create product');
@@ -77,7 +77,7 @@ router.patch(
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
   ): Promise<void> => {
-    const { id, category, description, name, colour, price, size } = req.body;
+    const { id, category, description, name, colour, price, size,  material, care, season} = req.body;
 
     if (typeof id !== 'string') {
       res.status(BAD_REQUEST).send('Missing id');
@@ -109,8 +109,23 @@ router.patch(
       return;
     }
 
-    if(typeof size !== 'string'){
+    if(typeof size !== 'number'){
         res.status(BAD_REQUEST).send('Missing size');
+      return;
+    }
+
+    if(typeof material !== 'string'){
+        res.status(BAD_REQUEST).send('Missing material');
+      return;
+    }
+
+    if(typeof care !== 'string'){
+        res.status(BAD_REQUEST).send('Missing care');
+      return;
+    }
+
+    if(typeof season !== 'string'){
+        res.status(BAD_REQUEST).send('Missing season');
       return;
     }
 
@@ -124,9 +139,12 @@ router.patch(
     product.category = category
     product.colour = colour
     product.description = description
-    product.size = size
+    product.size = 38
     product.name = name
     product.price = price
+    product.material = material
+    product.season = season
+
 
     res.status(OK).json(product);
   },

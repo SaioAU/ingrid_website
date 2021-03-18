@@ -18,5 +18,8 @@ declare type ProductInput = {
   description?: string;
   price?: string;
   size?: string;
+  material?: string;
+  care?: string;
+  season?: string;
 };
 
