@@ -8,7 +8,8 @@
     "typeorm": "./node_modules/.bin/ts-node ./node_modules/.bin/typeorm",
     "test": "jest --detectOpenHandles",
     "lint": "eslint . --ext .ts",
-    "createUser": "ts-node src/scripts/createUser.ts"
+    "create-user": "ts-node src/scripts/createUser.ts",
+    "list-users": "ts-node src/scripts/listUsers.ts"
   },
   "author": "",
   "license": "ISC",

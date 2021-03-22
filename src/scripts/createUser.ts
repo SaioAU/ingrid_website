@@ -2,7 +2,7 @@ import intializeDB from '../db';
 import { User } from '../entities';
 import { omit } from '../utils';
 
-// Example use: npm run createUser -- "Snoopy Snoop" test@example.com password
+// Example use: npm run create-user -- "Snoopy Snoop" test@example.com password
 
 intializeDB()
   .then(async () => {
