@@ -8,10 +8,10 @@ const router = Router();
 
 const { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK } = StatusCodes;
 
-// curl -H "Auth: ..." http://localhost:3000/products/all
+// curl -H "Auth: ..." http://localhost:3000/products/read/all
 router.get(
   '/read/all',
-  [checkJwt],
+   [checkJwt],
   async (_: Request, res: Response): Promise<void> => {
     const products = await Product.find();
 
@@ -19,10 +19,10 @@ router.get(
   },
 );
 
-// curl -H "Auth: ..." http://localhost:3000/products?id=1
+// curl -H "Auth: ..." http://localhost:3000/products/read?id=1
 router.get(
   '/read',
-  [checkJwt],
+   [checkJwt],
   async (req: Request, res: Response): Promise<void> => {
     const { id } = req.query;
 
@@ -38,12 +38,12 @@ router.get(
 );
 
 /*
-curl -H "Auth: ..." -XPOST -H "Content-Type: application/json" http://localhost:3000/products \
+curl -H "Auth: ..." -XPOST -H "Content-Type: application/json" http://localhost:3000/products/create \
 --data '{"category": "handbag", "name": "classy", "size": "big", "price": 1000, "colour": "blue", "description": "awesome", "material": "cotton", "care": "handwashed", "season": "summer"}'
 */
 router.post(
   '/create',
-  [checkJwt],
+   [checkJwt],
   async (
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
@@ -67,12 +67,12 @@ router.post(
 );
 
 /*
-curl -H "Auth: ..." -XPATCH -H "Content-Type: application/json" http://localhost:3000/products \
---data '{"id": 1, "name": "new name"}'
+curl -H "Auth: ..." -XPATCH -H "Content-Type: application/json" http://localhost:3000/products/update \
+--data --data '{"id": "b4f7b015-3fbc-4fe9-b5ce-244d11bb87d2", "category": "handbag", "name": "classy", "size": 4, "price": 1000, "colour": "blue", "description": "awesome", "material": "cotton", "care": "handwashed", "season": "summer"}'
 */
 router.patch(
   '/update',
-  [checkJwt],
+   [checkJwt],
   async (
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
@@ -139,7 +139,7 @@ router.patch(
     product.category = category
     product.colour = colour
     product.description = description
-    product.size = 38
+    product.size = size
     product.name = name
     product.price = price
     product.material = material
@@ -151,12 +151,12 @@ router.patch(
 );
 
 /*
-curl -H "Auth: ..." -XDELETE -H "Content-Type: application/json" http://localhost:3000/products \
+curl -H "Auth: ..." -XDELETE -H "Content-Type: application/json" http://localhost:3000/products/delete \
 --data '{"id": 1}'
 */
 router.delete(
   '/delete',
-  [checkJwt],
+   [checkJwt],
   async (
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
