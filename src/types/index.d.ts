@@ -23,3 +23,4 @@ declare type ProductInput = {
   season?: string;
 };
 
+declare type UserTakeout = { name: string; email: string; id: string };

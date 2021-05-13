@@ -1,12 +1,6 @@
-import {
-  BaseEntity,
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  getConnection,
-} from 'typeorm';
+import { BaseEntity, Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-import { getConnectionName, hash } from '../utils';
+import { hash } from '../utils';
 
 @Entity()
 class User extends BaseEntity {
@@ -22,6 +16,10 @@ class User extends BaseEntity {
   @Column()
   password: string;
 
+  getTakeout(): UserTakeout {
+    return { name: this.name, email: this.email, id: this.id };
+  }
+
   async checkUnencryptedPassword(password: string): Promise<boolean> {
     try {
       const salt = this.password.split(':')[0];
@@ -29,7 +27,6 @@ class User extends BaseEntity {
 
       return hashedPassword === this.password;
     } catch (err) {
-      console.error(err);
       return false;
     }
   }

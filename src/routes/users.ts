@@ -16,7 +16,7 @@ router.get(
   async (_: Request, res: Response): Promise<void> => {
     const users = await User.find();
 
-    res.status(OK).json(users);
+    res.status(OK).json(users.map((user) => user.getTakeout()));
   },
 );
 
@@ -34,7 +34,7 @@ router.get(
 
     const user = await User.findOne({ id });
 
-    res.status(OK).json(user);
+    res.status(OK).json(user?.getTakeout());
   },
 );
 
@@ -63,7 +63,7 @@ router.post(
       return;
     }
 
-    res.status(OK).json(user);
+    res.status(OK).json(user?.getTakeout());
   },
 );
 
@@ -94,7 +94,7 @@ router.patch(
 
     await UserController.update(user, name, email);
 
-    res.status(OK).json(user);
+    res.status(OK).json(user?.getTakeout());
   },
 );
 

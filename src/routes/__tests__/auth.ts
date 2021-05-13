@@ -78,7 +78,7 @@ describe('Auth', () => {
       expect(headers.authtoken).toEqual(expect.stringMatching(/^ey.+/i));
       expect(headers['set-cookie']).toHaveLength(1);
       expect(headers['set-cookie'][0]).toEqual(
-        expect.stringMatching(/^refreshToken=ey.+HttpOnly$/i),
+        expect.stringMatching(/^refresh=ey.+HttpOnly$/i),
       );
     });
   });
@@ -136,7 +136,7 @@ describe('Auth', () => {
 
       const { headers } = await request(app)
         .get('/auth/refresh-token')
-        .set('Cookie', [`refreshToken=${token}`])
+        .set('Cookie', [`refresh=${token}`])
         .expect(401);
 
       expect(headers.authtoken).toBeFalsy();
@@ -148,13 +148,13 @@ describe('Auth', () => {
 
       const { headers } = await request(app)
         .get('/auth/refresh-token')
-        .set('Cookie', [`refreshToken=${token}`])
+        .set('Cookie', [`refresh=${token}`])
         .expect(200);
 
       expect(headers.authtoken).toEqual(expect.stringMatching(/^ey.+/i));
       expect(headers['set-cookie']).toHaveLength(1);
       expect(headers['set-cookie'][0]).toEqual(
-        expect.stringMatching(/^refreshToken=ey.+HttpOnly$/i),
+        expect.stringMatching(/^refresh=ey.+HttpOnly$/i),
       );
     });
   });

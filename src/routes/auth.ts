@@ -76,7 +76,7 @@ router.post(
 
     // Send the jwts in the response
     res.setHeader('authToken', authToken);
-    res.cookie('refreshToken', refreshToken, { httpOnly: true });
+    res.cookie('refresh', refreshToken, { httpOnly: true });
     res.status(OK).send();
   },
 );
@@ -120,9 +120,9 @@ router.get(
     const jwtSecret = getJwtSecret();
     const accessTokenExpiration = getAccessTokenExpiration();
     const refreshTokenExpiration = getRefreshTokenExpiration();
-    const { refreshToken } = req.cookies;
+    const { refresh } = req.cookies;
 
-    if (!refreshToken) {
+    if (!refresh) {
       res.status(UNAUTHORIZED).send();
       return;
     }
@@ -130,7 +130,7 @@ router.get(
     let userId;
 
     try {
-      userId = (jwt.verify(refreshToken, jwtSecret) as JwtPayload).userId;
+      userId = (jwt.verify(refresh, jwtSecret) as JwtPayload).userId;
     } catch (err) {
       res.status(UNAUTHORIZED).send();
       return;
@@ -160,7 +160,7 @@ router.get(
     );
 
     res.setHeader('authToken', newAuthToken);
-    res.cookie('refreshToken', newRefreshToken, { httpOnly: true });
+    res.cookie('refresh', newRefreshToken, { httpOnly: true });
     res.status(OK).send();
   },
 );

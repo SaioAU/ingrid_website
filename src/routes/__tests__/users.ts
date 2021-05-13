@@ -50,8 +50,7 @@ describe('Users', () => {
         .query({ id: user?.id })
         .expect(200);
 
-      expect(body).toMatchObject({ ...(user ?? {}) });
-      expect(body.password).toBeTruthy();
+      expect(body).toMatchObject({ ...(user?.getTakeout() ?? {}) });
       expect(headers.authtoken).toBeTruthy();
     });
     test('/all should not return users without auth', async () => {
@@ -71,7 +70,10 @@ describe('Users', () => {
         .get('/users/all')
         .set('auth', token)
         .expect(200);
-      expect(body).toMatchObject(expect.arrayContaining([user1, user2]));
+
+      expect(body).toMatchObject(
+        expect.arrayContaining([user1?.getTakeout(), user2?.getTakeout()]),
+      );
     });
   });
 
@@ -113,11 +115,11 @@ describe('Users', () => {
         }),
       );
       expect(body.id).toBeTruthy();
-      expect(body.password).toBeTruthy();
-      expect(body.password).not.toBe('password2');
 
       const user = await User.findOne({ id: body.id });
-      expect(user).toMatchObject(body);
+      expect(user?.getTakeout()).toMatchObject(body);
+      expect(user?.password).toBeTruthy();
+      expect(user?.password).not.toBe('password2');
     });
   });
 

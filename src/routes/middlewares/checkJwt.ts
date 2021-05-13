@@ -17,10 +17,10 @@ export default (req: Request, res: Response, next: NextFunction): void => {
     return;
   }
 
-  const { userId, username } = jwtPayload;
+  const { userId } = jwtPayload;
 
   // Return new token with every request
-  const authToken = jwt.sign({ userId, username }, jwtSecret, {
+  const authToken = jwt.sign({ userId }, jwtSecret, {
     expiresIn: getAccessTokenExpiration(),
   });
 
