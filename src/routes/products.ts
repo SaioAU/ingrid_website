@@ -8,10 +8,9 @@ const router = Router();
 
 const { BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND, OK } = StatusCodes;
 
-// curl -H "Auth: ..." http://localhost:3000/products/read/all
+// curl http://localhost:3000/products/read/all
 router.get(
   '/read/all',
-   [checkJwt],
   async (_: Request, res: Response): Promise<void> => {
     const products = await Product.find();
 
@@ -19,10 +18,9 @@ router.get(
   },
 );
 
-// curl -H "Auth: ..." http://localhost:3000/products/read?id=1
+// curl http://localhost:3000/products/read?id=1
 router.get(
   '/read',
-   [checkJwt],
   async (req: Request, res: Response): Promise<void> => {
     const { id } = req.query;
 
