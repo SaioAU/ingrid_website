@@ -3,26 +3,29 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
+    ManyToOne
   } from 'typeorm';
-  
-  
+
+import Season from "./Seasons"
+
+
   @Entity()
   class Product extends BaseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
-  
+
     @Column()
     category: string;
 
     @Column()
     description: string;
-    
+
     @Column()
     name: string;
-  
+
     @Column()
     colour: string;
-  
+
     @Column()
     price: number;
 
@@ -35,15 +38,15 @@ import {
     @Column({
         nullable: true,
     })
-    size: number; 
+    size: number;
 
-    @Column({
-      nullable: true,
-  })
-  season: string;
+    @ManyToOne(() => Season, season => season.products, {nullable: true})
+    season: Season;
+
+
 
     // this function needs to  be restricted to ingrid, how do i check if user logged in first?
-  
+
     static async createProduct(
     name: string,
     category: string,
@@ -53,7 +56,7 @@ import {
     price: number,
     material: string,
     care: string,
-    season: string,
+    season?: Season,
   ): Promise<Product | undefined> {
     const product = new Product();
     product.name = name;
@@ -64,13 +67,11 @@ import {
     product.colour = colour;
     product.material = material;
     product.care = care;
-    product.season  = season;
+    if (season) product.season  = season;
 
     await product.save();
     return product;
   }
 }
-  
-  export default Product;
 
-  
+  export default Product;

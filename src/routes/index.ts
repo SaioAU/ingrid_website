@@ -3,7 +3,8 @@ import { StatusCodes } from 'http-status-codes';
 
 import AuthRouter from './auth';
 import UserRouter from './users';
-import ProductsRouter from './products'
+import ProductsRouter from './products';
+import SeasonsRouter from './seasons';
 
 const router = Router();
 
@@ -21,5 +22,7 @@ router.use('/users', UserRouter);
 router.use('/auth', AuthRouter);
 
 router.use('/products', ProductsRouter);
+
+router.use('/seasons', SeasonsRouter);
 
 export default router;

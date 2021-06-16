@@ -48,14 +48,14 @@ router.post(
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
   ): Promise<void> => {
-    const { category, description, name, colour, price, size, material, care,  season} = req.body;
+    const { category, description, name, colour, price, size, material, care} = req.body;
 
-    if (!category || !description || !name || !colour || !price || !size || !material || !care || !season) {
+    if (!category || !description || !name || !colour || !price || !size || !material || !care) {
       res.status(BAD_REQUEST).send('Missing email, name or password');
       return;
     }
 
-    const product = await Product.createProduct(name, category, 38, colour, description, 1000, material, care, season);
+    const product = await Product.createProduct(name, category, 38, colour, description, 1000, material, care);
 
     if (!product) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not create product');
@@ -143,8 +143,6 @@ router.patch(
     product.name = name
     product.price = price
     product.material = material
-    product.season = season
-
 
     res.status(OK).json(product);
   },
