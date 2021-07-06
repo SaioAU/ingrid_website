@@ -41,7 +41,7 @@ curl -H "Auth: ..." -XPOST -H "Content-Type: application/json" http://localhost:
 */
 router.post(
   '/create',
-   [checkJwt],
+   //[checkJwt],
   async (
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
