@@ -20,7 +20,7 @@ declare type ProductInput = {
   size?: string;
   material?: string;
   care?: string;
-  season?: string;
+  seasonId?: string;
 };
 
 declare type UserTakeout = { name: string; email: string; id: string };

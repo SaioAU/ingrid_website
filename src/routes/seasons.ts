@@ -30,8 +30,11 @@ router.get(
     }
 
     const season = await Season.findOne({ id });
+    const products = await season?.products;
+    console.log(products);
 
-    res.status(OK).json(season);
+
+    res.status(OK).json({season, products});
   },
 );
 

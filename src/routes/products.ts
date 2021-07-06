@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { Product } from '../entities';
+import { Product, Season } from '../entities';
 import { checkJwt } from './middlewares';
 
 const router = Router();
@@ -66,16 +66,16 @@ router.post(
 
 /*
 curl -H "Auth: ..." -XPATCH -H "Content-Type: application/json" http://localhost:3000/products/update \
---data --data '{"id": "b4f7b015-3fbc-4fe9-b5ce-244d11bb87d2", "category": "handbag", "name": "classy", "size": 4, "price": 1000, "colour": "blue", "description": "awesome", "material": "cotton", "care": "handwashed", "season": "summer"}'
+--data --data '{"id": "b4f7b015-3fbc-4fe9-b5ce-244d11bb87d2", "category": "handbag", "name": "classy", "size": 4, "price": 1000, "colour": "blue", "description": "awesome", "material": "cotton", "care": "handwashed", "seasonId": "9d573d0b-6909-4637-a51d-48535d0c1482"}'
 */
 router.patch(
   '/update',
-   [checkJwt],
+   // [checkJwt],
   async (
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
   ): Promise<void> => {
-    const { id, category, description, name, colour, price, size,  material, care, season} = req.body;
+    const { id, category, description, name, colour, price, size,  material, care, seasonId} = req.body;
 
     if (typeof id !== 'string') {
       res.status(BAD_REQUEST).send('Missing id');
@@ -122,16 +122,18 @@ router.patch(
       return;
     }
 
-    if(typeof season !== 'string'){
-        res.status(BAD_REQUEST).send('Missing season');
-      return;
-    }
-
     const product = await Product.findOne({ id });
 
     if (!product) {
       res.status(NOT_FOUND).send('Product not found');
       return;
+    }
+
+    console.log('HHHH1', seasonId, 'KKK1')
+    if(typeof seasonId === 'string'){
+        const season = await Season.findOne({id: seasonId});
+        console.log('HHHH', season, 'KKK')
+        if (season){product.season = season};
     }
 
     product.category = category
