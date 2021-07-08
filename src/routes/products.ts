@@ -18,7 +18,7 @@ router.get(
   },
 );
 
-// curl http://localhost:3000/products/read?id=1
+// curl http://localhost:3000/products/read?id=8c1c468c-3055-4ce0-b354-fc70387f99b6
 router.get(
   '/read',
   async (req: Request, res: Response): Promise<void> => {
@@ -129,11 +129,11 @@ router.patch(
       return;
     }
 
-    console.log('HHHH1', seasonId, 'KKK1')
     if(typeof seasonId === 'string'){
         const season = await Season.findOne({id: seasonId});
-        console.log('HHHH', season, 'KKK')
-        if (season){product.season = season};
+        if (season){
+          season.products = [ ...(season.products  || []), product ]
+        };
     }
 
     product.category = category
@@ -143,6 +143,8 @@ router.patch(
     product.name = name
     product.price = price
     product.material = material
+
+    await product.save();
 
     res.status(OK).json(product);
   },

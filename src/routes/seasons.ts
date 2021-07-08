@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { Season } from '../entities';
+import { Season,  Product } from '../entities';
 import { checkJwt } from './middlewares';
 
 const router = Router();
@@ -30,8 +30,9 @@ router.get(
     }
 
     const season = await Season.findOne({ id });
-    const products = await season?.products;
-    console.log(products);
+    //const products = await season?.products;
+    const products = await Product.find({ where: { season: { id } } })
+    console.log("read single  season products", products);
 
 
     res.status(OK).json({season, products});
