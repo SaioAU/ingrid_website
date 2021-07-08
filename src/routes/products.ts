@@ -131,7 +131,9 @@ router.patch(
 
     if(typeof seasonId === 'string'){
         const season = await Season.findOne({id: seasonId});
-        if (season){
+
+        if (season) {
+          product.season = season;
           season.products = [ ...(season.products  || []), product ]
         };
     }

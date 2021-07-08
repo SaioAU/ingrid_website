@@ -30,9 +30,7 @@ router.get(
     }
 
     const season = await Season.findOne({ id });
-    //const products = await season?.products;
     const products = await Product.find({ where: { season: { id } } })
-    console.log("read single  season products", products);
 
 
     res.status(OK).json({season, products});
