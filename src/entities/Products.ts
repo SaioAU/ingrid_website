@@ -56,7 +56,7 @@ import Season from "./Seasons"
     price: number,
     material: string,
     care: string,
-    season?: Season,
+    seasonId?: string,
   ): Promise<Product | undefined> {
     const product = new Product();
     product.name = name;
@@ -67,7 +67,15 @@ import Season from "./Seasons"
     product.colour = colour;
     product.material = material;
     product.care = care;
-    if (season) product.season  = season;
+
+    if(typeof seasonId === 'string'){
+        const season = await Season.findOne({id: seasonId});
+
+        if (season) {
+          product.season = season;
+          season.products = [ ...(season.products  || []), product ]
+        };
+    }
 
     await product.save();
     return product;

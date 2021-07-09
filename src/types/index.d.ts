@@ -16,8 +16,8 @@ declare type ProductInput = {
   name?: string;
   colour?: string;
   description?: string;
-  price?: string;
-  size?: string;
+  price?: number;
+  size?: number;
   material?: string;
   care?: string;
   seasonId?: string;

@@ -46,14 +46,16 @@ router.post(
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
   ): Promise<void> => {
-    const { category, description, name, colour, price, size, material, care} = req.body;
+    const { category, description, name, colour, price, size, material, care, seasonId} = req.body;
 
-    if (!category || !description || !name || !colour || !price || !size || !material || !care) {
-      res.status(BAD_REQUEST).send('Missing email, name or password');
+    if (!category || !description || !name || !colour || !price || !size || !material || !care || !seasonId) {
+      res.status(BAD_REQUEST).send('Missing one of the fields for product');
+      console.log({ category, description, name, colour, price, size, material, care});
+
       return;
     }
 
-    const product = await Product.createProduct(name, category, 38, colour, description, 1000, material, care);
+    const product = await Product.createProduct(name, category, size, colour, description, price, material, care, seasonId);
 
     if (!product) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not create product');
