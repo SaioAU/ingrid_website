@@ -38,7 +38,7 @@ import Season from "./Seasons"
     @Column({
         nullable: true,
     })
-    size: number;
+    size: string ;
 
     @ManyToOne(() => Season, season => season.products, {nullable: true})
     season: Season;
@@ -50,7 +50,7 @@ import Season from "./Seasons"
     static async createProduct(
     name: string,
     category: string,
-    size: number,
+    size: string,
     colour: string,
     description: string,
     price: number,

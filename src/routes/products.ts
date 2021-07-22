@@ -55,7 +55,7 @@ router.post(
       return;
     }
 
-    const product = await Product.createProduct(name, category, size, colour, description, price, material, care, seasonId);
+    const product = await Product.createProduct(name, category, size.toString(), colour, description, price, material, care, seasonId);
 
     if (!product) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not create product');
@@ -109,7 +109,7 @@ router.patch(
       return;
     }
 
-    if(typeof size !== 'number'){
+    if(typeof size !== 'string' &&  typeof size !== 'number'){
         res.status(BAD_REQUEST).send('Missing size');
       return;
     }
@@ -143,12 +143,14 @@ router.patch(
     product.category = category
     product.colour = colour
     product.description = description
-    product.size = size
+    product.size = size.toString()
     product.name = name
     product.price = price
     product.material = material
 
     await product.save();
+    console.log(product,'🇹🇿');
+
 
     res.status(OK).json(product);
   },
