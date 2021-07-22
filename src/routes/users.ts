@@ -40,7 +40,7 @@ router.get(
 
 /*
 curl -H "Auth: ..." -XPOST -H "Content-Type: application/json" http://localhost:3000/users \
---data '{"email": "test@example.com", "name": "Newman", "password": "yolo1234"}'
+--data '{"email": "test@example.com", "name": "Newman", "password": "password"}'
 */
 router.post(
   '/',

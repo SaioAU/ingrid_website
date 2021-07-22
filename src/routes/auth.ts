@@ -46,6 +46,7 @@ router.post(
       return;
     }
 
+
     const user = await User.findOne({ email });
 
     if (!user) {
