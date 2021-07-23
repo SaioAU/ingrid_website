@@ -89,7 +89,7 @@ router.patch(
       return;
     }
 
-    if(typeof year !== 'string'){
+    if(typeof year !== 'number'){
         res.status(BAD_REQUEST).send('Missing year');
       return;
     }
@@ -103,7 +103,7 @@ router.patch(
 
     season.year = year
     season.name = name
-
+    await season.save()
     res.status(OK).json(season);
   },
 );
