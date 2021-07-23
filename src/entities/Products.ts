@@ -3,7 +3,8 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    ManyToOne
+    ManyToOne,
+    JoinColumn
   } from 'typeorm';
 
 import Season from "./Seasons"
@@ -40,7 +41,13 @@ import Season from "./Seasons"
     })
     size: string ;
 
+    @Column({
+      name: 'seasonId', nullable: true
+    })
+    seasonId: string;
+    
     @ManyToOne(() => Season, season => season.products, {nullable: true})
+    @JoinColumn({name : 'seasonId'})
     season: Season;
 
 

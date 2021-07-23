@@ -78,6 +78,7 @@ router.patch(
     res: Response,
   ): Promise<void> => {
     const { id, category, description, name, colour, price, size,  material, care, seasonId} = req.body;
+console.log(id, seasonId, '🇨🇭');
 
     if (typeof id !== 'string') {
       res.status(BAD_REQUEST).send('Missing id');
