@@ -55,7 +55,7 @@ router.post(
       return;
     }
 
-    const season = await Season.createSeason(name, year);
+    const season = await Season.createSeason(name, Number(year));
 
     if (!season) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not create season');
