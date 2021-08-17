@@ -69,6 +69,7 @@ import Image from "./Images"
     material: string,
     care: string,
     seasonId?: string,
+    images: object[],
   ): Promise<Product | undefined> {
     const product = new Product();
     product.name = name;
@@ -89,7 +90,14 @@ import Image from "./Images"
         };
     }
 
+
     await product.save();
+
+
+    images.forEach(image => {
+      Image.createImage(image, product.id)
+    });
+
     return product;
   }
 }
