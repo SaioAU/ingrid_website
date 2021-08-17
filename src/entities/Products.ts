@@ -4,10 +4,12 @@ import {
     PrimaryGeneratedColumn,
     Column,
     ManyToOne,
+    OneToMany,
     JoinColumn
   } from 'typeorm';
 
 import Season from "./Seasons"
+import Image from "./Images"
 
 
   @Entity()
@@ -45,10 +47,13 @@ import Season from "./Seasons"
       name: 'seasonId', nullable: true
     })
     seasonId: string;
-    
+
     @ManyToOne(() => Season, season => season.products, {nullable: true})
     @JoinColumn({name : 'seasonId'})
     season: Season;
+
+    @OneToMany(() => Image, image => image.product)
+    images: Image[];
 
 
 
