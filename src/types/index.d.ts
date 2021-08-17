@@ -20,6 +20,7 @@ declare type ProductInput = {
   size?: number;
   material?: string;
   care?: string;
+  images: { data: string, colour: string}[];
   seasonId?: string;
 };
 

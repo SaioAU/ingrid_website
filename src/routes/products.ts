@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { Product, Season } from '../entities';
+import { Product, Season, Image } from '../entities';
 import { checkJwt } from './middlewares';
 
 const router = Router();
@@ -30,8 +30,9 @@ router.get(
     }
 
     const product = await Product.findOne({ id });
+    const images = await Image.find({ where: { product: { id } } })
 
-    res.status(OK).json(product);
+    res.status(OK).json({ ...product, images });
   },
 );
 
@@ -46,23 +47,26 @@ router.post(
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
   ): Promise<void> => {
-    const { category, description, name, colour, price, size, material, care, seasonId} = req.body;
+    const { category, description, name, colour, price, size, material, care, seasonId, images} = req.body;
 
-    if (!category || !description || !name || !colour || !price || !size || !material || !care || !seasonId) {
+    if (!category || !description || !name || !colour || !price || !size || !material || !care || !seasonId || !images) {
       res.status(BAD_REQUEST).send('Missing one of the fields for product');
       console.log({ category, description, name, colour, price, size, material, care});
 
       return;
     }
 
-    const product = await Product.createProduct(name, category, size.toString(), colour, description, price, material, care, seasonId);
+    const product = await Product.createProduct(name, category, size.toString(), colour, description, price, material, care, images, seasonId);
 
     if (!product) {
       res.status(INTERNAL_SERVER_ERROR).send('Could not create product');
       return;
     }
 
-    res.status(OK).json(product);
+    const { season } = product;
+    const payload = { ...product, season: { id:  season.id, year:  season.year, name: season.name } }
+
+    res.status(OK).json(payload);
   },
 );
 

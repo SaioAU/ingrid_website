@@ -68,8 +68,8 @@ import Image from "./Images"
     price: number,
     material: string,
     care: string,
+    images: { data: string, colour: string }[],
     seasonId?: string,
-    images: object[],
   ): Promise<Product | undefined> {
     const product = new Product();
     product.name = name;
@@ -95,7 +95,7 @@ import Image from "./Images"
 
 
     images.forEach(image => {
-      Image.createImage(image, product.id)
+      Image.createImage(image.data, image.colour, product.id)
     });
 
     return product;

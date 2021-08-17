@@ -32,9 +32,9 @@ import Product from "./Products"
 
     // this function needs to  be restricted to ingrid, how do i check if user logged in first?
 
-    static async createImage(
-    colour: string,
+  static async createImage(
     data: string,
+    colour: string,
     productId?: string,
   ): Promise<Image | undefined> {
     const image = new Image();
