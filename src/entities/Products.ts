@@ -100,8 +100,8 @@ import Image from "./Images"
     product.material = material;
     product.care = care;
 
-    if(typeof seasonId === 'string'){
-        const season = await Season.findOne({id: seasonId});
+    if(seasonId && typeof seasonId === 'string'){
+        const season = await Season.findOne({ id: seasonId });
 
         if (season) {
           product.season = season;
