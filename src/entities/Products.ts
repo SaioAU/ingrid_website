@@ -59,7 +59,26 @@ import Image from "./Images"
 
     // this function needs to  be restricted to ingrid, how do i check if user logged in first?
 
-    static async createProduct(
+  async updateImages(imagesData: { id?: string, data: string, colour: string }[]): Promise<void> {
+    const currentImages = await Image.find({ where: { product: { id: this.id } } });
+
+    // Delete
+    const deletedImages = currentImages.filter(({ id }) => !imagesData.find((data) => data.id === id));
+    await Promise.all(deletedImages.map(async (image) => await Image.delete(image)));
+
+    // Create
+    const newImagesData = imagesData.filter(({ id }) => !id);
+    const newImages = await Promise.all(newImagesData.map(async (image) => {
+      return await Image.createImage(image.data, image.colour, this.id);
+    }));
+
+    const keptImages = currentImages.filter(({ id }) => Boolean(imagesData.find((data) => data.id === id)));
+    // TODO: Update (colour etc)
+
+    this.images = [...keptImages, ...newImages];
+  }
+
+  static async createProduct(
     name: string,
     category: string,
     size: string,
@@ -90,15 +109,33 @@ import Image from "./Images"
         };
     }
 
-
     await product.save();
-
-
-    images.forEach(image => {
-      Image.createImage(image.data, image.colour, product.id)
-    });
+    await product.updateImages(images);
 
     return product;
+  }
+
+  static async get(productId: string): Promise<Product | undefined> {
+    const product = await Product.findOne({ id: productId });
+
+    if (!product) return undefined;
+
+    const images = await Image.find({ where: { product: { id: productId } } });
+    product.images = images;
+
+    return product;
+  }
+
+  // Avoid circular json
+  serialize(): Product {
+    const { season, images = [] } = this;
+    const { products, ...seasonWithoutProducts } = season ?? {};
+
+    return {
+      ...this,
+      images: images.map(({ product, ...rest }) => rest),
+      season: seasonWithoutProducts,
+    };
   }
 }
 

@@ -36,11 +36,10 @@ import Product from "./Products"
     data: string,
     colour: string,
     productId?: string,
-  ): Promise<Image | undefined> {
+  ): Promise<Image> {
     const image = new Image();
     image.colour = colour;
     image.data = data;
-
 
     if(typeof productId === 'string'){
         const product = await Product.findOne({id: productId});

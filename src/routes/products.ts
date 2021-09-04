@@ -14,7 +14,7 @@ router.get(
   async (_: Request, res: Response): Promise<void> => {
     const products = await Product.find();
 
-    res.status(OK).json(products);
+    res.status(OK).json(products.map((product) => product.serialize()));
   },
 );
 
@@ -29,10 +29,14 @@ router.get(
       return;
     }
 
-    const product = await Product.findOne({ id });
-    const images = await Image.find({ where: { product: { id } } })
+    const product = await Product.get(id);
 
-    res.status(OK).json({ ...product, images });
+    if (!product) {
+      res.status(NOT_FOUND);
+      return;
+    }
+
+    res.status(OK).json(product.serialize());
   },
 );
 
@@ -63,10 +67,7 @@ router.post(
       return;
     }
 
-    const { season } = product;
-    const payload = { ...product, season: { id:  season.id, year:  season.year, name: season.name } }
-
-    res.status(OK).json(payload);
+    res.status(OK).json(product.serialize());
   },
 );
 
@@ -81,8 +82,19 @@ router.patch(
     req: Request<GenericObject, GenericObject, ProductInput>,
     res: Response,
   ): Promise<void> => {
-    const { id, category, description, name, colour, price, size,  material, care, seasonId} = req.body;
-console.log(id, seasonId, '🇨🇭');
+    const {
+      id,
+      category,
+      description,
+      name,
+      colour,
+      price,
+      size,
+      material,
+      care,
+      seasonId,
+      images = [],
+    } = req.body;
 
     if (typeof id !== 'string') {
       res.status(BAD_REQUEST).send('Missing id');
@@ -129,35 +141,34 @@ console.log(id, seasonId, '🇨🇭');
       return;
     }
 
-    const product = await Product.findOne({ id });
+    const product = await Product.get(id);
 
     if (!product) {
       res.status(NOT_FOUND).send('Product not found');
       return;
     }
 
-    if(typeof seasonId === 'string'){
-        const season = await Season.findOne({id: seasonId});
+    if (typeof seasonId === 'string') {
+      const season = await Season.findOne({id: seasonId});
 
-        if (season) {
-          product.season = season;
-          season.products = [ ...(season.products  || []), product ]
-        };
+      if (season) {
+        product.season = season;
+        season.products = [ ...(season.products ?? []), product ];
+      };
     }
 
-    product.category = category
-    product.colour = colour
-    product.description = description
-    product.size = size.toString()
-    product.name = name
-    product.price = price
-    product.material = material
+    product.category = category;
+    product.colour = colour;
+    product.description = description;
+    product.size = size.toString();
+    product.name = name;
+    product.price = price;
+    product.material = material;
 
+    await product.updateImages(images);
     await product.save();
-    console.log(product,'🇹🇿');
 
-
-    res.status(OK).json(product);
+    res.status(OK).json(product.serialize());
   },
 );
 

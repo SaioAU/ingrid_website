@@ -29,11 +29,9 @@ router.get(
       return;
     }
 
-    const season = await Season.findOne({ id });
-    const products = await Product.find({ where: { season: { id } } })
+    const season = await Season.get(id, true);
 
-
-    res.status(OK).json({season, products});
+    res.status(OK).json(season);
   },
 );
 

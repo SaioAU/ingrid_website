@@ -25,7 +25,7 @@ import Product from "./Products";
 
     // this function needs to  be restricted to ingrid, how do i check if user logged in first?
 
-    static async createSeason(
+  static async createSeason(
     name: string,
     year: number,
   ): Promise<Season | undefined> {
@@ -34,6 +34,17 @@ import Product from "./Products";
     season.year = year;
 
     await season.save();
+    return season;
+  }
+
+  static async get(seasonId: string, includeProducts = false): Promise<Season | undefined> {
+    const season = await Season.findOne({ id: seasonId });
+
+    if (!season) return undefined;
+    if (!includeProducts) return season;
+
+    const products = await Product.find({ where: { season: { id: seasonId } } });
+    season.products = products;
     return season;
   }
 }
