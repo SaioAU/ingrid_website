@@ -53,7 +53,7 @@ router.post(
   ): Promise<void> => {
     const { category, description, name, colour, price, size, material, care, seasonId, images} = req.body;
 
-    if (!category || !description || !name || !colour || !price || !size || !material || !care || !images) {
+    if (!category || !description || !name || !colour || price === undefined || size  ===  undefined || !material || !care || !images) {
       res.status(BAD_REQUEST).send('Missing one of the fields for product');
       console.log({ category, description, name, colour, price, size, material, care});
 
